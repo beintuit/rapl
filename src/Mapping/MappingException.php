@@ -64,4 +64,14 @@ class MappingException extends \Exception implements RAPLException
     {
         return new self(sprintf('A %s route is not configured for class %s.', $routeType, $className));
     }
+
+    /**
+     * @param string $type
+     *
+     * @return MappingException
+     */
+    public static function unknownType($type)
+    {
+        return new self(sprintf('Unknown column type %s requested.', $type));
+    }
 }
