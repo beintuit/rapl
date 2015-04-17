@@ -114,45 +114,6 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returnedEntity, $actual[0]);
     }
 
-    public function testDeserializeUnknownDataType()
-    {
-        $className = 'Foo\Bar';
-
-        $classMetadata = $this->mockClassMetadata(
-            'Foo\Bar',
-            array(
-                'foo' => array(
-                    'serializedName' => 'foo',
-                    'type'           => 'foo'
-                )
-            )
-        );
-
-        $classMetadataFactory = $this->mockClassMetadataFactory();
-
-        $expectedData = array(
-            'foo' => null,
-        );
-
-        $returnedEntity = \Mockery::mock($className);
-
-        $unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
-        $unitOfWork->shouldReceive('createEntity')->withArgs(array($className, $expectedData))->andReturn(
-            $returnedEntity
-        )->once();
-
-        $serializer = new Serializer($classMetadata, $unitOfWork, $classMetadataFactory);
-
-        $data = '{"results":[{
-            "foo": "barfoo"
-        }]}';
-
-        $actual = $serializer->deserialize($data, true, array('results'));
-
-        $this->assertSame(1, count($actual));
-        $this->assertSame($returnedEntity, $actual[0]);
-    }
-
     /**
      * @param array $classMetadata
      *

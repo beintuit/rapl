@@ -4,6 +4,7 @@ namespace RAPL\RAPL\Serializer;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use RAPL\RAPL\Mapping\ClassMetadata;
+use RAPL\RAPL\Types\Type;
 use RAPL\RAPL\UnitOfWork;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -150,34 +151,8 @@ class Serializer implements SerializerInterface
                         }
                     }
                 } else {
-                    switch ($fieldMapping['type']) {
-                        case 'string':
-                            if (!is_null($value)) {
-                                $value = (string) $value;
-                            }
-                            break;
-
-                        case 'integer':
-                            if (!is_null($value)) {
-                                $value = (int) $value;
-                            }
-                            break;
-
-                        case 'boolean':
-                            if (!is_null($value)) {
-                                $value = (bool) $value;
-                            }
-                            break;
-
-                        case 'datetime':
-                            if (!is_null($value)) {
-                                $value = new \DateTime($value);
-                            }
-                            break;
-
-                        default:
-                            $value = null;
-                    }
+                    $type  = Type::getType($fieldMapping['type']);
+                    $value = $type->convertToPhpValue($value);
                 }
 
                 $mappedEntityData[$fieldName] = $value;
