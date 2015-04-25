@@ -18,6 +18,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('collection'))->andReturn(true);
         $classMetadataMock->shouldReceive('getRoute')->withArgs(array('resource'))->andReturn($resourceRoute);
         $classMetadataMock->shouldReceive('getRoute')->withArgs(array('collection'))->andReturn($collectionRoute);
+        $classMetadataMock->shouldReceive('getSerializedName')->with('id')->andReturn('id');
+        $classMetadataMock->shouldReceive('getSerializedName')->with('title')->andReturn('serialized_title');
 
         $router = new Router();
 
@@ -28,7 +30,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('books/3', $actual);
 
         $actual = $router->generate($classMetadataMock, array('title' => 'Foo'));
-        $this->assertSame('books?title=Foo', $actual);
+        $this->assertSame('books?serialized_title=Foo', $actual);
     }
 
     public function testMissingRouteConfigurationThrowsException()

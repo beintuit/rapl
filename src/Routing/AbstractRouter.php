@@ -25,6 +25,9 @@ abstract class AbstractRouter implements RouterInterface
         $limit = null,
         $offset = null
     ) {
+        $conditions = $this->mapKeys($classMetadata, $conditions);
+        $orderBy    = $this->mapKeys($classMetadata, $orderBy);
+
         $query = new Query($conditions, $orderBy, $limit, $offset);
 
         $route = $this->selectRoute($classMetadata, $query);
@@ -37,6 +40,23 @@ abstract class AbstractRouter implements RouterInterface
         } else {
             return $path . '?' . $queryString;
         }
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param array         $array
+     *
+     * @return array
+     */
+    private function mapKeys(ClassMetadata $classMetadata, array $array)
+    {
+        $array = array_flip($array);
+
+        $array = array_map(function ($fieldName) use ($classMetadata) {
+            return $classMetadata->getSerializedName($fieldName);
+        }, $array);
+
+        return array_flip($array);
     }
 
     /**

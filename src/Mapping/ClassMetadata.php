@@ -257,6 +257,19 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * Gets the serialized name for a field name.
+     * If no serialized name can be found the field name is returned.
+     *
+     * @param string $fieldName
+     *
+     * @return string mixed
+     */
+    public function getSerializedName($fieldName)
+    {
+        return isset($this->fieldMappings[$fieldName]['serializedName']) ? $this->fieldMappings[$fieldName]['serializedName'] : $fieldName;
+    }
+
+    /**
      * Gets the mapping of a (regular) field that holds some data but not a
      * reference to another object.
      *
