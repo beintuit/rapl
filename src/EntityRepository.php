@@ -38,7 +38,8 @@ class EntityRepository implements ObjectRepository
     public function find($id)
     {
         if (!is_array($id)) {
-            $idField = $this->classMetadata->getIdentifierFieldNames()[0];
+            $idFields = $this->classMetadata->getIdentifierFieldNames();
+            $idField  = reset($idFields);
 
             $id = array($idField => $id);
         }
