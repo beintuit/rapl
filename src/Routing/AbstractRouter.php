@@ -70,17 +70,38 @@ abstract class AbstractRouter implements RouterInterface
      */
     protected function selectRoute(ClassMetadata $classMetadata, Query $query)
     {
-        if ($classMetadata->hasRoute('resource') && count($query->getConditions()) === 1 && array_key_exists(
-                'id',
-                $query->getConditions()
-            )
-        ) {
+        if ($this->canUseResourceRoute($classMetadata, $query)) {
             return $classMetadata->getRoute('resource');
         } elseif ($classMetadata->hasRoute('collection')) {
             return $classMetadata->getRoute('collection');
         }
 
         throw MappingException::routeNotConfigured($classMetadata->getName(), 'collection');
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param Query         $query
+     *
+     * @return bool
+     */
+    protected function canUseResourceRoute(ClassMetadata $classMetadata, Query $query)
+    {
+        if (!$classMetadata->hasRoute('resource')) {
+            return false;
+        }
+
+        if (count($query->getConditions()) !== count($classMetadata->getIdentifierFieldNames())) {
+            return false;
+        }
+
+        foreach ($classMetadata->getIdentifierFieldNames() as $idField) {
+            if (!array_key_exists($idField, $query->getConditions())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

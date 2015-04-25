@@ -62,6 +62,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $className = 'RAPL\Tests\Entities\Library\Author';
 
         $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
         $classMetadata->shouldReceive('newInstance')->andReturn(new Author());
         $classMetadata->shouldReceive('hasField')->withArgs(array('id'))->andReturn(true);
         $classMetadata->shouldReceive('hasField')->withArgs(array('name'))->andReturn(true);

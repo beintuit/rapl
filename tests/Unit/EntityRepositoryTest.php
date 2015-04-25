@@ -15,6 +15,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $persister->shouldReceive('loadById')->withArgs(array(array('id' => 3)))->andReturn($object);
 
         $metadata   = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $metadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
         $repository = new EntityRepository($persister, $metadata);
 
         $this->assertSame($object, $repository->find(3));
