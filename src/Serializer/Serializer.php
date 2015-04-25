@@ -110,6 +110,8 @@ class Serializer implements SerializerInterface
         foreach ($envelopes as $envelope) {
             if (isset($data[$envelope])) {
                 $data = $data[$envelope];
+            } else {
+                return array();
             }
         }
 
