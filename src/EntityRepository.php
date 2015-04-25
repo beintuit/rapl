@@ -37,7 +37,13 @@ class EntityRepository implements ObjectRepository
      */
     public function find($id)
     {
-        return $this->persister->loadById(array('id' => $id));
+        if (!is_array($id)) {
+            $idField = $this->classMetadata->getIdentifierFieldNames()[0];
+
+            $id = array($idField => $id);
+        }
+
+        return $this->persister->loadById($id);
     }
 
     /**

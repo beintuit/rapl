@@ -13,6 +13,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $collectionRoute = new Route('books');
 
         $classMetadataMock = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $classMetadataMock->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
         $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('resource'))->andReturn(true);
         $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('collection'))->andReturn(true);
         $classMetadataMock->shouldReceive('getRoute')->withArgs(array('resource'))->andReturn($resourceRoute);

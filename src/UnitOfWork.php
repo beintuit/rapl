@@ -258,8 +258,12 @@ class UnitOfWork
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $this->manager->getClassMetadata($className);
 
-        $idHash = $data['id'];
-        $id     = array('id' => $data['id']);
+        $id = array();
+        foreach ($classMetadata->getIdentifierFieldNames() as $idField) {
+            $id[$idField] = $data[$idField];
+        }
+
+        $idHash = implode(' ', $id);
 
         if (isset($this->identityMap[$className][$idHash])) {
             $entity = $this->identityMap[$className][$idHash];
