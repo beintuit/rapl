@@ -6,29 +6,51 @@ use RAPL\RAPL\Repository\DefaultRepositoryFactory;
 
 class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetRepository()
-    {
-        $className = 'SomeClass';
+    /**
+     * @var DefaultRepositoryFactory
+     */
+    private $factory;
 
-        $metadata = \Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-        $metadata->shouldReceive('getName')->andReturn($className);
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $unitOfWork;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $entityManager;
+
+    const CLASS_NAME = 'SomeClass';
+
+    protected function setUp()
+    {
+        $this->factory = new DefaultRepositoryFactory();
+
+        $classMetadata = \Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata->shouldReceive('getName')->andReturn(self::CLASS_NAME);
 
         $persister = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
 
-        $unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
-        $unitOfWork->shouldReceive('getEntityPersister')->withArgs(array($className))->andReturn($persister)->once();
+        $this->unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
+        $this->unitOfWork->shouldReceive('getEntityPersister')->with(self::CLASS_NAME)->andReturn($persister);
 
-        $manager = \Mockery::mock('RAPL\RAPL\EntityManagerInterface');
-        $manager->shouldReceive('getClassMetadata')->withArgs(array($className))->andReturn($metadata);
-        $manager->shouldReceive('getUnitOfWork')->andReturn($unitOfWork)->once();
+        $this->entityManager = \Mockery::mock('RAPL\RAPL\EntityManagerInterface');
+        $this->entityManager->shouldReceive('getUnitOfWork')->andReturn($this->unitOfWork);
+        $this->entityManager->shouldReceive('getClassMetadata')->andReturn($classMetadata);
+    }
 
-        $factory = new DefaultRepositoryFactory();
+    public function testGetRepositoryReturnsRepositoryInstance()
+    {
+        $repository = $this->factory->getRepository($this->entityManager, self::CLASS_NAME);
+        $this->assertInstanceOf('RAPL\RAPL\EntityRepository', $repository);
+    }
 
-        $actual = $factory->getRepository($manager, $className);
-        $this->assertInstanceOf('Doctrine\Common\Persistence\ObjectRepository', $actual);
+    public function testCallingGetRepositoryTwiceReturnsTheSameInstance()
+    {
+        $repository  = $this->factory->getRepository($this->entityManager, self::CLASS_NAME);
+        $repository2 = $this->factory->getRepository($this->entityManager, self::CLASS_NAME);
 
-        // test that we receive the same instance again
-        $actual2 = $factory->getRepository($manager, $className);
-        $this->assertSame($actual, $actual2);
+        $this->assertSame($repository, $repository2);
     }
 }

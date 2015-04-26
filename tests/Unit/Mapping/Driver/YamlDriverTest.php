@@ -6,60 +6,84 @@ use RAPL\RAPL\Mapping\Driver\YamlDriver;
 
 class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLoadMetadataForClass()
+    /**
+     * @var YamlDriver
+     */
+    private $mappingDriver;
+
+    /**
+     * @var \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadata
+     */
+    private $classMetadata;
+
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    protected function setUp()
     {
-        $className = 'RAPL\Tests\Fixtures\Entities\Book';
+        $paths               = array(__DIR__ . '/../../../Fixtures/config/');
+        $this->mappingDriver = new YamlDriver($paths);
 
-        $paths  = array(__DIR__ . '/../../../Fixtures/config/');
-        $driver = new YamlDriver($paths);
+        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata->shouldReceive('setFormat')->with('json')->once();
+    }
 
-        $metadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $metadata->shouldReceive('setFormat')->withArgs(array('json'))->once();
+    public function testLoadMetadataForClassMaps()
+    {
+        $this->classMetadata
+            ->shouldReceive('setRoute')
+            ->once()
+            ->with('resource', \Mockery::type('RAPL\RAPL\Mapping\Route'));
 
-        $metadata->shouldReceive('setRoute')->withArgs(array('resource', \Mockery::type('RAPL\RAPL\Mapping\Route')))
-            ->once();
-        $metadata->shouldReceive('setRoute')->withArgs(array('collection', \Mockery::type('RAPL\RAPL\Mapping\Route')))
-            ->once();
+        $this->classMetadata
+            ->shouldReceive('setRoute')
+            ->once()
+            ->with('collection', \Mockery::type('RAPL\RAPL\Mapping\Route'));
 
-        $metadata->shouldReceive('mapField')->withArgs(
-            array(
+        $this->classMetadata
+            ->shouldReceive('mapField')
+            ->once()
+            ->with(
                 array(
                     'fieldName'      => 'id',
                     'type'           => 'integer',
                     'serializedName' => null,
                     'id'             => true
                 )
-            )
-        )->once();
-        $metadata->shouldReceive('mapField')->withArgs(
-            array(
+            );
+
+        $this->classMetadata
+            ->shouldReceive('mapField')
+            ->once()
+            ->with(
                 array(
                     'fieldName'      => 'title',
                     'type'           => 'string',
                     'serializedName' => null
                 )
-            )
-        )->once();
-        $metadata->shouldReceive('mapField')->withArgs(
-            array(
+            );
+
+        $this->classMetadata
+            ->shouldReceive('mapField')
+            ->once()
+            ->with(
                 array(
                     'fieldName'      => 'isbn',
                     'type'           => null,
                     'serializedName' => null
                 )
-            )
-        )->once();
+            );
 
-        $metadata->shouldReceive('mapEmbedOne')->withArgs(
-            array(
+        $this->classMetadata
+            ->shouldReceive('mapEmbedOne')
+            ->once()
+            ->with(
                 array(
                     'targetEntity'   => 'RAPL\Tests\Fixtures\Entities\Author',
                     'fieldName'      => 'author',
                     'serializedName' => null
                 )
-            )
-        )->once();
+            );
 
-        $driver->loadMetadataForClass($className, $metadata);
+        $this->mappingDriver->loadMetadataForClass(self::CLASS_NAME, $this->classMetadata);
     }
 }

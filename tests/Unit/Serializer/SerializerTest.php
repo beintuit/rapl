@@ -2,197 +2,172 @@
 
 namespace RAPL\Tests\Unit\Serializer;
 
+use Mockery\MockInterface;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Serializer\Serializer;
 
 class SerializerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDeserialize()
+    /**
+     * @var \Mockery\MockInterface|ClassMetadata
+     */
+    private $classMetadata;
+
+    /**
+     * @var \Mockery\MockInterface|\RAPL\RAPL\UnitOfWork
+     */
+    private $unitOfWork;
+
+    /**
+     * @var \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadataFactory
+     */
+    private $classMetadataFactory;
+
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    protected function setUp()
     {
-        $className         = 'Foo\Bar';
-        $embeddedClassName = 'Foo\BarBaz';
+        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata->shouldReceive('getName')->andReturn('Foo\Bar');
+        $this->classMetadata->shouldReceive('getFormat')->andReturn('json');
 
-        $classMetadata = $this->getClassMetadata($className);
+        $this->unitOfWork           = \Mockery::mock('RAPL\RAPL\UnitOfWork');
+        $this->classMetadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
 
-        $expectedEmbeddedData = array(
-            'foo' => 'Bar'
-        );
-
-        $returnedEmbeddedEntity = \Mockery::mock($embeddedClassName);
-
-        $expectedData = array(
-            'stringProperty'      => 'Foo Bar',
-            'integerProperty'     => 5,
-            'booleanProperty'     => false,
-            'datetimeProperty'    => new \DateTime('2014-12-10 14:32:01'),
-            'embedOneAssociation' => $returnedEmbeddedEntity,
-        );
-
-        $returnedEntity = \Mockery::mock($className);
-
-        $unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
-        $unitOfWork->shouldReceive('createEntity')->withArgs(array('Foo\BarBaz', $expectedEmbeddedData))->andReturn(
-            $returnedEmbeddedEntity
-        )->once();
-        $unitOfWork->shouldReceive('createEntity')->withArgs(array($className, $expectedData))->andReturn(
-            $returnedEntity
-        )->once();
-
-        $embeddedClassMetadata = $this->getEmbeddedClassMetadata();
-        $classMetadataFactory  = $this->mockClassMetadataFactory(array('Foo\BarBaz' => $embeddedClassMetadata));
-
-        $serializer = new Serializer($classMetadata, $unitOfWork, $classMetadataFactory);
-
-        $classMetadata->shouldReceive('getFieldName')->withArgs(array('unknown'))->andReturn('unknown')->once();
-        $classMetadata->shouldReceive('hasField')->withArgs(array('unknown'))->andReturn(false)->once();
-
-        $data = '{"results":[{
-            "string": "Foo Bar",
-            "integer": 5,
-            "boolean": false,
-            "datetime": "2014-12-10 14:32:01",
-            "embedOne": {
-                "foo": "Bar"
-            },
-            "unknown": "adsf"
-        }]}';
-
-        $actual = $serializer->deserialize($data, true, array('results'));
-
-        $this->assertSame(1, count($actual));
-        $this->assertSame($returnedEntity, $actual[0]);
-    }
-
-    public function testDeserializeWithNullAssociation()
-    {
-        $className = 'Foo\Bar';
-
-        $classMetadata         = $this->mockClassMetadata(
-            'Foo\Bar',
-            array(
-                'embedOneAssociation' => array(
-                    'serializedName' => 'embedOne',
-                    'embedded'       => true,
-                    'type'           => 'one',
-                    'association'    => ClassMetadata::EMBED_ONE,
-                    'targetEntity'   => 'Foo\BarBaz'
-                )
-            )
-        );
-        $embeddedClassMetadata = $this->mockClassMetadata(
-            'Foo\BarBaz',
-            array(
-                'foo' => array(
-                    'serializedName' => 'foo',
-                    'type'           => 'string'
-                )
-            )
-        );
-
-        $classMetadataFactory = $this->mockClassMetadataFactory(array('Foo\BarBaz' => $embeddedClassMetadata));
-
-        $expectedData = array(
-            'embedOneAssociation' => null,
-        );
-
-        $returnedEntity = \Mockery::mock($className);
-
-        $unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
-        $unitOfWork->shouldReceive('createEntity')->withArgs(array($className, $expectedData))->andReturn(
-            $returnedEntity
-        )->once();
-
-        $serializer = new Serializer($classMetadata, $unitOfWork, $classMetadataFactory);
-
-        $data = '{"results":[{
-            "embedOne": null
-        }]}';
-
-        $actual = $serializer->deserialize($data, true, array('results'));
-
-        $this->assertSame(1, count($actual));
-        $this->assertSame($returnedEntity, $actual[0]);
+        $this->serializer = new Serializer($this->classMetadata, $this->unitOfWork, $this->classMetadataFactory);
     }
 
     /**
-     * @param array $classMetadata
-     *
-     * @return \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadataFactory
+     * @param MockInterface $classMetadataMock
+     * @param string        $fieldName
+     * @param array         $mapping
      */
-    protected function mockClassMetadataFactory(array $classMetadata = array())
+    private function addFieldMappingTo(MockInterface $classMetadataMock, $fieldName, array $mapping = array())
     {
-        $classMetadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
-        foreach ($classMetadata as $className => $metadata) {
-            $classMetadataFactory->shouldReceive('getMetadataFor')->withArgs(array($className))->andReturn(
-                $metadata
-            )->once();
+        if (!isset($mapping['serializedName'])) {
+            $mapping['serializedName'] = $fieldName;
+        }
+        if (!isset($mapping['type'])) {
+            $mapping['type'] = 'string';
         }
 
-        return $classMetadataFactory;
+        $classMetadataMock->shouldReceive('getFieldName')->with($mapping['serializedName'])->andReturn($fieldName);
+        $classMetadataMock->shouldReceive('hasField')->with($fieldName)->andReturn(true);
+        $classMetadataMock->shouldReceive('getFieldMapping')->with($fieldName)->andReturn($mapping);
     }
 
     /**
      * @param string $className
-     * @param array  $propertyMappings
+     * @param array  $data
      *
-     * @return \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadata
+     * @return MockInterface
      */
-    protected function mockClassMetadata($className, array $propertyMappings)
+    private function mockReturnEntity($className, array $data)
     {
-        $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $classMetadata->shouldReceive('getName')->andReturn($className);
-        $classMetadata->shouldReceive('getFormat')->andReturn('json');
+        $entity = \Mockery::mock($className);
 
-        foreach ($propertyMappings as $name => $mapping) {
-            $classMetadata->shouldReceive('getFieldName')->with($mapping['serializedName'])->andReturn($name);
-            $classMetadata->shouldReceive('hasField')->with($name)->andReturn(true);
-            $classMetadata->shouldReceive('getFieldMapping')->with($name)->andReturn($mapping);
-        }
+        $this->unitOfWork->shouldReceive('createEntity')->with($className, $data)->once()->andReturn($entity);
 
-        return $classMetadata;
+        return $entity;
     }
 
-    /**
-     * @return \Mockery\MockInterface|ClassMetadata
-     */
-    protected function getEmbeddedClassMetadata()
+    public function testDeserializeSimpleDataReturnsHydratedEntities()
     {
-        $propertyMappings = array(
-            'foo' => array(
-                'serializedName' => 'foo',
+        $this->addFieldMappingTo(
+            $this->classMetadata,
+            'stringData',
+            array(
+                'serializedName' => 'string',
                 'type'           => 'string'
             )
         );
 
-        return $this->mockClassMetadata('Foo\BarBaz', $propertyMappings);
+        $returnedEntity  = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
+        $returnedEntity2 = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Bar Baz'));
+
+        $json = '[
+            {
+                "string": "Foo Bar"
+            },
+            {
+                "string": "Bar Baz"
+            }
+        ]';
+
+        $entities = $this->serializer->deserialize($json, true);
+
+        $this->assertSame(2, count($entities));
+        $this->assertSame($returnedEntity, $entities[0]);
+        $this->assertSame($returnedEntity2, $entities[1]);
     }
 
-    /**
-     * @param $className
-     *
-     * @return \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadata
-     */
-    protected function getClassMetadata($className)
+    public function testDeserializeSingleEntityReturnsArrayOfEntities()
     {
-        $propertyMappings = array(
-            'stringProperty'      => array(
+        $this->addFieldMappingTo(
+            $this->classMetadata,
+            'stringData',
+            array('serializedName' => 'string', 'type' => 'string')
+        );
+
+        $returnedEntity = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
+
+        $json = '{
+            "string": "Foo Bar"
+        }';
+
+        $result = $this->serializer->deserialize($json, false);
+
+        $this->assertSame(1, count($result));
+        $this->assertSame($returnedEntity, $result[0]);
+    }
+
+    public function testDeserializeWrappedDataUnwrapsTheDataBeforeDeserializing()
+    {
+        $this->addFieldMappingTo(
+            $this->classMetadata,
+            'stringData',
+            array(
                 'serializedName' => 'string',
                 'type'           => 'string'
-            ),
-            'integerProperty'     => array(
-                'serializedName' => 'integer',
-                'type'           => 'integer'
-            ),
-            'booleanProperty'     => array(
-                'serializedName' => 'boolean',
-                'type'           => 'boolean'
-            ),
-            'datetimeProperty'    => array(
-                'serializedName' => 'datetime',
-                'type'           => 'datetime',
-            ),
-            'embedOneAssociation' => array(
-                'serializedName' => 'embedOne',
+            )
+        );
+
+        $returnedEntity = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
+
+        $json = '{"results": [{
+            "string": "Foo Bar"
+        }]}';
+
+        $entities = $this->serializer->deserialize($json, true, array('results'));
+
+        $this->assertSame(1, count($entities));
+        $this->assertSame($returnedEntity, $entities[0]);
+    }
+
+    public function testDeserializeWithNonExistingEnvelopesReturnsEmptyArray()
+    {
+        $this->addFieldMappingTo($this->classMetadata, 'foo');
+
+        $json = '{"results": [{
+            "foo": "bar"
+        }]}';
+
+        $result = $this->serializer->deserialize($json, true, array('envelope'));
+
+        $this->assertEmpty($result);
+    }
+
+    public function testDeserializeComplexDataIncludesAssociatedEntities()
+    {
+        $this->addFieldMappingTo($this->classMetadata, 'string');
+        $this->addFieldMappingTo(
+            $this->classMetadata,
+            'embedded',
+            array(
+                'serializedName' => 'assoc',
                 'embedded'       => true,
                 'type'           => 'one',
                 'association'    => ClassMetadata::EMBED_ONE,
@@ -200,6 +175,63 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        return $this->mockClassMetadata($className, $propertyMappings);
+        $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $subClassMetadata->shouldReceive('getName')->andReturn('Foo\BarBaz');
+        $subClassMetadata->shouldReceive('getFormat')->andReturn('json');
+
+        $this->addFieldMappingTo($subClassMetadata, 'foo');
+
+        $subEntity  = $this->mockReturnEntity('Foo\BarBaz', array('foo' => 'bar'));
+        $mainEntity = $this->mockReturnEntity('Foo\Bar', array('string' => 'foo', 'embedded' => $subEntity));
+
+        $this->classMetadataFactory->shouldReceive('getMetadataFor')->andReturn($subClassMetadata);
+
+        $json = '[{
+            "string": "foo",
+            "assoc": {
+                "foo": "bar"
+            }
+        }]';
+
+        $entities = $this->serializer->deserialize($json, true);
+
+        $this->assertSame(1, count($entities));
+        $this->assertSame($mainEntity, $entities[0]);
+    }
+
+    public function testDeserializeWithMissingAssociation()
+    {
+        $this->addFieldMappingTo($this->classMetadata, 'string');
+        $this->addFieldMappingTo(
+            $this->classMetadata,
+            'embedded',
+            array(
+                'serializedName' => 'assoc',
+                'embedded'       => true,
+                'type'           => 'one',
+                'association'    => ClassMetadata::EMBED_ONE,
+                'targetEntity'   => 'Foo\BarBaz'
+            )
+        );
+
+        $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $subClassMetadata->shouldReceive('getName')->andReturn('Foo\BarBaz');
+        $subClassMetadata->shouldReceive('getFormat')->andReturn('json');
+
+        $this->addFieldMappingTo($subClassMetadata, 'foo');
+
+        $mainEntity = $this->mockReturnEntity('Foo\Bar', array('string' => 'foo', 'embedded' => null));
+
+        $this->classMetadataFactory->shouldReceive('getMetadataFor')->andReturn($subClassMetadata);
+
+        $json = '[{
+            "string": "foo",
+            "assoc": null
+        }]';
+
+        $entities = $this->serializer->deserialize($json, true);
+
+        $this->assertSame(1, count($entities));
+        $this->assertSame($mainEntity, $entities[0]);
     }
 }

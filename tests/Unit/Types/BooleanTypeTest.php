@@ -2,13 +2,17 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use RAPL\RAPL\Types\BooleanType;
 use RAPL\RAPL\Types\Type;
 
 class BooleanTypeTest extends AbstractTypeTest
 {
-    protected function setUp()
+    /**
+     * @return BooleanType
+     */
+    protected function getInstance()
     {
-        $this->type = Type::getType('boolean');
+        return Type::getType('boolean');
     }
 
     public function testBooleanConvertsToSerializedValue()

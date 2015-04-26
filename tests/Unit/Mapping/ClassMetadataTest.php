@@ -9,195 +9,162 @@ use RAPL\Tests\Fixtures\Entities\Book;
 
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetName()
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    /**
+     * @var ClassMetadata
+     */
+    private $classMetadata;
+
+    protected function setUp()
     {
-        $name = 'FooBar';
+        $this->classMetadata = new ClassMetadata(self::CLASS_NAME);
 
-        $metadata = new ClassMetadata($name);
+        $this->classMetadata->mapField(array('fieldName' => 'id', 'type' => 'integer', 'id' => true));
+        $this->classMetadata->mapField(array('fieldName' => 'title', 'serializedName' => 'book_title'));
 
-        $this->assertSame($name, $metadata->getName());
+        $reflService = new RuntimeReflectionService();
+
+        $this->classMetadata->initializeReflection($reflService);
+        $this->classMetadata->wakeupReflection($reflService);
     }
 
-    public function testGetReflectionClass()
+    public function testGetNameReturnsClassName()
     {
-        $metadata = new ClassMetadata('RAPL\Tests\Fixtures\Entities\Book');
-        $actual   = $metadata->getReflectionClass();
-        $this->assertInstanceOf('ReflectionClass', $actual);
-
-        $actual2 = $metadata->getReflectionClass();
-        $this->assertSame($actual, $actual2);
+        $this->assertSame(self::CLASS_NAME, $this->classMetadata->getName());
     }
 
-    public function testIsIdentifier()
+    public function testGetReflectionClassReturnsReflectionClassInstance()
     {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'fieldName' => 'id',
-                'id'        => true
-            )
+        $classMetadata = new ClassMetadata(self::CLASS_NAME);
+
+        $this->assertInstanceOf('ReflectionClass', $classMetadata->getReflectionClass());
+    }
+
+    public function testCallingGetReflectionClassTwiceReturnsSameInstance()
+    {
+        $classMetadata = new ClassMetadata(self::CLASS_NAME);
+
+        $this->assertSame($classMetadata->getReflectionClass(), $classMetadata->getReflectionClass());
+    }
+
+    public function testIsIdentifierReturnsTrueForIdentifierProperty()
+    {
+        $this->assertTrue($this->classMetadata->isIdentifier('id'));
+    }
+
+    public function testIsIdentifierReturnsFalseForNonIdentifierProperty()
+    {
+        $this->assertFalse($this->classMetadata->isIdentifier('title'));
+    }
+
+    public function testHasFieldReturnsTrueForMappedProperty()
+    {
+        $this->assertTrue($this->classMetadata->hasField('title'));
+    }
+
+    public function testHasFieldReturnsFalseForNonMappedProperty()
+    {
+        $this->assertFalse($this->classMetadata->hasField('foo'));
+    }
+
+    public function testGetFieldNamesReturnsMappedFieldNames()
+    {
+        $this->assertSame(array('id', 'title'), $this->classMetadata->getFieldNames());
+    }
+
+    public function testGetFieldNameReturnsFieldNameForSerializedName()
+    {
+        $this->assertSame('title', $this->classMetadata->getFieldName('book_title'));
+    }
+
+    public function testGetFieldMappingReturnsFieldMapping()
+    {
+        $this->assertSame(
+            array('fieldName' => 'title', 'serializedName' => 'book_title', 'type' => 'string'),
+            $this->classMetadata->getFieldMapping('title')
         );
-        $metadata->mapField(
-            array(
-                'fieldName' => 'foo'
-            )
-        );
-
-        $this->assertTrue($metadata->isIdentifier('id'));
-        $this->assertFalse($metadata->isIdentifier('foo'));
     }
 
-    public function testHasField()
-    {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'fieldName' => 'foo'
-            )
-        );
-
-        $this->assertTrue($metadata->hasField('foo'));
-        $this->assertFalse($metadata->hasField('bar'));
-    }
-
-    public function testGetFieldNames()
-    {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'fieldName' => 'foo'
-            )
-        );
-
-        $expected = array('foo');
-        $this->assertSame($expected, $metadata->getFieldNames());
-    }
-
-    public function testGetFieldName()
-    {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'fieldName'      => 'foo',
-                'serializedName' => 'foobar_foo'
-            )
-        );
-
-        $this->assertSame('foo', $metadata->getFieldName('foobar_foo'));
-    }
-
-    public function testGetFieldMapping()
-    {
-        $mapping = array(
-            'fieldName'      => 'foo',
-            'serializedName' => 'foo_bar',
-            'type'           => 'integer'
-        );
-
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField($mapping);
-
-        $this->assertSame($mapping, $metadata->getFieldMapping('foo'));
-    }
-
-    public function testGetNonExistingFieldMappingThrowsException()
+    public function testGetFieldMappingForNonMappedFieldThrowsException()
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $metadata = new ClassMetadata('FooBar');
-
-        $metadata->getFieldMapping('fooBar');
+        $this->classMetadata->getFieldMapping('fooBar');
     }
 
     public function testGetIdentifierFieldNames()
     {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'fieldName' => 'id',
-                'type'      => 'integer',
-                'id'        => true
-            )
-        );
-
-        $this->assertEquals(array('id'), $metadata->getIdentifierFieldNames());
-        $this->assertEquals(array('id'), $metadata->getIdentifier());
+        $this->assertEquals(array('id'), $this->classMetadata->getIdentifierFieldNames());
+        $this->assertEquals(array('id'), $this->classMetadata->getIdentifier());
     }
 
     public function testGetTypeOfField()
     {
-        $metadata = $this->getClassMetadata();
-
-        $this->assertSame('string', $metadata->getTypeOfField('title'));
+        $this->assertSame('integer', $this->classMetadata->getTypeOfField('id'));
+        $this->assertSame('string', $this->classMetadata->getTypeOfField('title'));
     }
 
     public function testGetNonExistingAssociationTargetClassThrowsException()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->getAssociationTargetClass('fooBar');
+        $this->classMetadata->getAssociationTargetClass('fooBar');
     }
 
     public function testIsAssociationInverseSide()
     {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(array(
-            'fieldName' => 'foo',
-            'association' => ClassMetadata::EMBED_ONE,
-            'isOwningSide' => false
-        ));
+        $this->classMetadata->mapField(
+            array(
+                'fieldName'    => 'foo',
+                'association'  => ClassMetadata::EMBED_ONE,
+                'isOwningSide' => false
+            )
+        );
 
-        $this->assertTrue($metadata->isAssociationInverseSide('foo'));
+        $this->assertTrue($this->classMetadata->isAssociationInverseSide('foo'));
     }
 
     public function testGetAssociationMappedByTargetField()
     {
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(array(
-            'fieldName' => 'foo',
-            'association' => ClassMetadata::EMBED_ONE,
-            'mappedBy' => 'bar'
-        ));
+        $this->classMetadata->mapField(
+            array(
+                'fieldName'   => 'foo',
+                'association' => ClassMetadata::EMBED_ONE,
+                'mappedBy'    => 'bar'
+            )
+        );
 
-        $this->assertSame('bar', $metadata->getAssociationMappedByTargetField('foo'));
+        $this->assertSame('bar', $this->classMetadata->getAssociationMappedByTargetField('foo'));
     }
 
     public function testGetIdentifierValues()
     {
-        $metadata = $this->getClassMetadata();
-
         $object = new Book();
-        $object->setTitle('Foo Bar');
-        $object->setIsbn('1234567890');
+        $object->setId(123);
 
-        $actual = $metadata->getIdentifierValues($object);
-        $this->assertSame(array('id' => null), $actual);
+        $actual = $this->classMetadata->getIdentifierValues($object);
+        $this->assertSame(array('id' => 123), $actual);
     }
 
-    public function testMapField()
+    public function testMapFieldValidatesAndCompletesFieldMapping()
     {
         $mapping = array(
             'fieldName' => 'test'
         );
 
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField($mapping);
+        $this->classMetadata->mapField($mapping);
 
-        $this->assertTrue($metadata->hasField('test'));
-        $this->assertSame($metadata->getTypeOfField('test'), 'string');
+        $this->assertTrue($this->classMetadata->hasField('test'));
+        $this->assertSame('string', $this->classMetadata->getTypeOfField('test'));
+        $this->assertSame('test', $this->classMetadata->getSerializedName('test'));
     }
 
-    public function testMapFieldWithoutFieldNameThrowsException()
+    public function testCallingMapFieldWithoutFieldNameThrowsException()
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapField(
-            array(
-                'type' => 'string'
-            )
-        );
+        $this->classMetadata->mapField(array());
     }
 
     public function testEmbedOne()
@@ -209,127 +176,70 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             'targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author'
         );
 
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapEmbedOne($mapping);
+        $this->classMetadata->mapEmbedOne($mapping);
 
-        $this->assertTrue($metadata->hasField($fieldName));
-        $this->assertTrue($metadata->hasEmbed($fieldName));
-        $this->assertTrue($metadata->hasAssociation($fieldName));
-        $this->assertTrue($metadata->isSingleValuedAssociation($fieldName));
-        $this->assertFalse($metadata->isCollectionValuedAssociation($fieldName));
-        $this->assertSame(array('author'), $metadata->getAssociationNames());
-        $this->assertSame('RAPL\Tests\Fixtures\Entities\Author', $metadata->getAssociationTargetClass($fieldName));
+        $this->assertTrue($this->classMetadata->hasField($fieldName));
+        $this->assertTrue($this->classMetadata->hasEmbed($fieldName));
+        $this->assertTrue($this->classMetadata->hasAssociation($fieldName));
+        $this->assertTrue($this->classMetadata->isSingleValuedAssociation($fieldName));
+        $this->assertFalse($this->classMetadata->isCollectionValuedAssociation($fieldName));
+        $this->assertSame(array('author'), $this->classMetadata->getAssociationNames());
+        $this->assertSame(
+            'RAPL\Tests\Fixtures\Entities\Author',
+            $this->classMetadata->getAssociationTargetClass($fieldName)
+        );
+    }
+
+    public function testCallingMapEmbedOneWithoutTargetEntityThrowsException()
+    {
+        $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
+
+        $this->classMetadata->mapEmbedOne(array('fieldName' => 'author'));
     }
 
     public function testMapEmbedOneWithoutFieldNameThrowsException()
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapEmbedOne(
-            array(
-                'targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author'
-            )
-        );
-    }
-
-    public function testMapEmbeddedWithoutTargetEntityThrowsException()
-    {
-        $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
-
-        $metadata = new ClassMetadata('FooBar');
-        $metadata->mapEmbedOne(
-            array(
-                'fieldName' => 'author'
-            )
-        );
+        $this->classMetadata->mapEmbedOne(array('targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author'));
     }
 
     public function testNewInstance()
     {
-        $metadata = $this->getClassMetadata();
-
-        $actual = $metadata->newInstance();
-
-        $this->assertInstanceOf('RAPL\Tests\Fixtures\Entities\Book', $actual);
+        $this->assertInstanceOf('RAPL\Tests\Fixtures\Entities\Book', $this->classMetadata->newInstance());
     }
 
     public function testSetGetFormat()
     {
-        $format = 'xml';
+        $this->classMetadata->setFormat('xml');
 
-        $metadata = $this->getClassMetadata();
-        $metadata->setFormat($format);
-
-        $actual = $metadata->getFormat();
-
-        $this->assertSame($format, $actual);
+        $this->assertSame('xml', $this->classMetadata->getFormat());
     }
 
     public function testSetGetRoutes()
     {
-        $metadata = $this->getClassMetadata();
+        $this->assertFalse($this->classMetadata->hasRoute('resource'));
+        $this->assertFalse($this->classMetadata->hasRoute('collection'));
 
-        $this->assertFalse($metadata->hasRoute('resource'));
-        $this->assertFalse($metadata->hasRoute('collection'));
-
-        $this->assertNull($metadata->getRoute('resource'));
+        $this->assertNull($this->classMetadata->getRoute('resource'));
 
         $resourceRoute   = new Route('books/{id}', array('results', 0));
         $collectionRoute = new Route('books', array('results'));
 
-        $metadata->setRoute('resource', $resourceRoute);
-        $metadata->setRoute('collection', $collectionRoute);
+        $this->classMetadata->setRoute('resource', $resourceRoute);
+        $this->classMetadata->setRoute('collection', $collectionRoute);
 
-        $this->assertTrue($metadata->hasRoute('resource'));
-        $this->assertTrue($metadata->hasRoute('collection'));
+        $this->assertTrue($this->classMetadata->hasRoute('resource'));
+        $this->assertTrue($this->classMetadata->hasRoute('collection'));
 
-        $actual = $metadata->getRoute('collection');
-
-        $this->assertSame($collectionRoute, $actual);
+        $this->assertSame($collectionRoute, $this->classMetadata->getRoute('collection'));
     }
 
     public function testSetFieldValue()
     {
-        $metadata = $this->getClassMetadata();
-
         $book = new Book();
 
-        $metadata->setFieldValue($book, 'title', 'FooBar');
+        $this->classMetadata->setFieldValue($book, 'title', 'FooBar');
         $this->assertSame('FooBar', $book->getTitle());
-    }
-
-    /**
-     * @return ClassMetadata
-     */
-    private function getClassMetadata()
-    {
-        $metadata = new ClassMetadata('RAPL\Tests\Fixtures\Entities\Book');
-        $metadata->mapField(
-            array(
-                'fieldName' => 'id',
-                'type'      => 'integer',
-                'id'        => true
-            )
-        );
-        $metadata->mapField(
-            array(
-                'fieldName' => 'title',
-                'type'      => 'string'
-            )
-        );
-        $metadata->mapField(
-            array(
-                'fieldName' => 'isbn',
-                'type'      => 'string',
-            )
-        );
-
-        $reflService = new RuntimeReflectionService();
-
-        $metadata->initializeReflection($reflService);
-        $metadata->wakeupReflection($reflService);
-
-        return $metadata;
     }
 }

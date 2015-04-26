@@ -2,13 +2,17 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use RAPL\RAPL\Types\FloatType;
 use RAPL\RAPL\Types\Type;
 
 class FloatTypeTest extends AbstractTypeTest
 {
-    protected function setUp()
+    /**
+     * @return FloatType
+     */
+    protected function getInstance()
     {
-        $this->type = Type::getType('float');
+        return Type::getType('float');
     }
 
     public function testFloatConvertsToPhpValue()

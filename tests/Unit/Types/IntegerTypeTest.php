@@ -2,13 +2,17 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use RAPL\RAPL\Types\IntegerType;
 use RAPL\RAPL\Types\Type;
 
 class IntegerTypeTest extends AbstractTypeTest
 {
-    protected function setUp()
+    /**
+     * @return IntegerType
+     */
+    protected function getInstance()
     {
-        $this->type = Type::getType('integer');
+        return Type::getType('integer');
     }
 
     public function testIntegerConvertsToPhpValue()

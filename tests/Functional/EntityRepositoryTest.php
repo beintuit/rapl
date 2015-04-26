@@ -7,128 +7,97 @@ use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\EntityManager;
+use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
 use RAPL\RAPL\Routing\Router;
 use RAPL\Tests\Fixtures\Entities\Book;
 
 class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    private $entityManager;
+
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    /**
+     * @var EntityRepository
+     */
+    private $repository;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $connection;
+
+    protected function setUp()
+    {
+        $this->connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
+
+        $configuration = new Configuration();
+        $paths         = array(__DIR__ . '/../Fixtures/config');
+        $driver        = new YamlDriver($paths, '.rapl.yml');
+        $configuration->setMetadataDriver($driver);
+
+        $this->entityManager = new EntityManager($this->connection, $configuration, new Router());
+
+        $this->repository = $this->entityManager->getRepository(self::CLASS_NAME);
+    }
+
     public function testFind()
     {
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-
         $json = '{"results": [{
             "id": 1,
             "title": "Winnie the Pooh",
             "isbn": "1234567890123"
         }]}';
 
-        $response = new Response(200, array(), $json);
-
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
-        $connection->shouldReceive('createRequest')->withArgs(array('GET', 'books/1'))->andReturn($request)->once();
-        $connection->shouldReceive('sendRequest')->withArgs(array($request))->andReturn($response)->once();
-
-        $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
-        $driver        = new YamlDriver($paths, '.rapl.yml');
-        $configuration->setMetadataDriver($driver);
-
-        $manager    = new EntityManager($connection, $configuration, new Router());
-        $repository = $manager->getRepository('RAPL\Tests\Fixtures\Entities\Book');
+        $this->mockHttpRequestAndResponse('books/1', 200, $json);
 
         /** @var Book $actual */
-        $actual = $repository->find(1);
+        $actual = $this->repository->find(1);
 
-        $this->assertInstanceOf('RAPL\Tests\Fixtures\Entities\Book', $actual);
+        $this->assertInstanceOf(self::CLASS_NAME, $actual);
         $this->assertSame('Winnie the Pooh', $actual->getTitle());
     }
 
-    public function testFindNonExistingReturnsNull()
+    public function testFindNonExistingEntityReturnsNull()
     {
-        $request  = new Request('GET', 'books/1');
-        $response = new Response(404, array());
+        $this->mockHttpRequestAndResponse('books/123', 404);
 
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
-        $connection->shouldReceive('createRequest')->withArgs(array('GET', 'books/1'))->andReturn($request)->once();
-
-        $exception = ClientErrorResponseException::factory($request, $response);
-        $connection->shouldReceive('sendRequest')->withArgs(array($request))->andThrow($exception);
-
-        $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
-        $driver        = new YamlDriver($paths, '.rapl.yml');
-        $configuration->setMetadataDriver($driver);
-
-        $manager    = new EntityManager($connection, $configuration, new Router());
-        $repository = $manager->getRepository('RAPL\Tests\Fixtures\Entities\Book');
-
-        $actual = $repository->find(1);
-
-        $this->assertNull($actual);
+        $this->assertNull($this->repository->find(123));
     }
 
     public function testFindThrowsOtherExceptions()
     {
-        $request  = new Request('GET', 'books/1');
-        $response = new Response(403, array());
-
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
-        $connection->shouldReceive('createRequest')->withArgs(array('GET', 'books/1'))->andReturn($request)->once();
-
-        $exception = ClientErrorResponseException::factory($request, $response);
-        $connection->shouldReceive('sendRequest')->withArgs(array($request))->andThrow($exception);
-
-        $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
-        $driver        = new YamlDriver($paths, '.rapl.yml');
-        $configuration->setMetadataDriver($driver);
-
-        $manager    = new EntityManager($connection, $configuration, new Router());
-        $repository = $manager->getRepository('RAPL\Tests\Fixtures\Entities\Book');
+        $this->mockHttpRequestAndResponse('books/1', 403);
 
         $this->setExpectedException('Guzzle\Http\Exception\ClientErrorResponseException');
 
-        $repository->find(1);
+        $this->repository->find(1);
     }
 
     public function testFindAll()
     {
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-
         $json = '{"results": [
-    {
-        "id": 1,
-        "title": "Winnie the Pooh",
-        "isbn": "1234567890123"
-    },
-    {
-        "id": 2,
-        "title": "Moby Dick",
-        "isbn": "9876543210321"
-    },
-    {
-        "id": 3,
-        "title": "Harry Potter",
-        "isbn": "1968132132980"
-    }
-]}';
+            {
+                "id": 1,
+                "title": "Winnie the Pooh",
+                "isbn": "1234567890123"
+            },
+            {
+                "id": 2,
+                "title": "Moby Dick",
+                "isbn": "9876543210321"
+            },
+            {
+                "id": 3,
+                "title": "Harry Potter",
+                "isbn": "1968132132980"
+            }
+        ]}';
 
-        $response = new Response(200, array(), $json);
+        $this->mockHttpRequestAndResponse('books', 200, $json);
 
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
-        $connection->shouldReceive('createRequest')->withArgs(array('GET', 'books'))->andReturn($request)->once();
-        $connection->shouldReceive('sendRequest')->withArgs(array($request))->andReturn($response)->once();
-
-        $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
-        $driver        = new YamlDriver($paths, '.rapl.yml');
-        $configuration->setMetadataDriver($driver);
-
-        $manager    = new EntityManager($connection, $configuration, new Router());
-        $repository = $manager->getRepository('RAPL\Tests\Fixtures\Entities\Book');
-
-        $actual = $repository->findAll();
+        $actual = $this->repository->findAll();
 
         $this->assertSame(3, count($actual));
         $this->assertContainsOnlyInstancesOf('RAPL\Tests\Fixtures\Entities\Book', $actual);
@@ -136,45 +105,51 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testFindOneBy()
     {
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-
         $json = '{"results": [
-    {
-        "id": 1,
-        "title": "Winnie the Pooh",
-        "isbn": "1234567890123"
-    },
-    {
-        "id": 2,
-        "title": "Moby Dick",
-        "isbn": "9876543210321"
-    },
-    {
-        "id": 3,
-        "title": "Harry Potter",
-        "isbn": "1968132132980"
-    }
-]}';
+            {
+                "id": 1,
+                "title": "Winnie the Pooh",
+                "isbn": "1234567890123"
+            },
+            {
+                "id": 2,
+                "title": "Moby Dick",
+                "isbn": "9876543210321"
+            },
+            {
+                "id": 3,
+                "title": "Harry Potter",
+                "isbn": "1968132132980"
+            }
+        ]}';
 
-        $response = new Response(200, array(), $json);
-
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
-        $connection->shouldReceive('createRequest')->withArgs(array('GET', 'books'))->andReturn($request)->once();
-        $connection->shouldReceive('sendRequest')->withArgs(array($request))->andReturn($response)->once();
-
-        $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
-        $driver        = new YamlDriver($paths, '.rapl.yml');
-        $configuration->setMetadataDriver($driver);
-
-        $manager    = new EntityManager($connection, $configuration, new Router());
-        $repository = $manager->getRepository('RAPL\Tests\Fixtures\Entities\Book');
+        $this->mockHttpRequestAndResponse('books', 200, $json);
 
         /** @var Book $actual */
-        $actual = $repository->findOneBy(array());
+        $actual = $this->repository->findOneBy(array());
 
         $this->assertInstanceOf('RAPL\Tests\Fixtures\Entities\Book', $actual);
         $this->assertSame('Winnie the Pooh', $actual->getTitle());
         $this->assertSame('1234567890123', $actual->getIsbn());
+    }
+
+    /**
+     * @param string $uri
+     * @param int    $responseCode
+     * @param string $responseData
+     */
+    private function mockHttpRequestAndResponse($uri, $responseCode = 200, $responseData = '')
+    {
+        $request  = new Request('GET', $uri);
+        $response = new Response($responseCode, array(), $responseData);
+
+        $this->connection->shouldReceive('createRequest')->once()->with('GET', $uri)->andReturn($request);
+
+        if ($responseCode >= 400) {
+            $exception = ClientErrorResponseException::factory($request, $response);
+            $this->connection->shouldReceive('sendRequest')->once()->with($request)->andThrow($exception);
+        } else {
+            $this->connection->shouldReceive('sendRequest')->once()->with($request)->andReturn($response);
+        }
     }
 }

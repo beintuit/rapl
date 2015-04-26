@@ -7,66 +7,67 @@ use RAPL\Tests\Fixtures\Entities\Book;
 
 class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var EntityRepository
+     */
+    private $entityRepository;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $entityPersister;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $classMetadata;
+
+    protected function setUp()
+    {
+        $this->entityPersister  = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
+        $this->classMetadata    = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->entityRepository = new EntityRepository($this->entityPersister, $this->classMetadata);
+    }
+
     public function testFind()
     {
         $object = new Book();
 
-        $persister = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $persister->shouldReceive('loadById')->withArgs(array(array('id' => 3)))->andReturn($object);
+        $this->entityPersister->shouldReceive('loadById')->once()->with(array('id' => 3))->andReturn($object);
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->once()->andReturn(array('id'));
 
-        $metadata   = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $metadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
-        $repository = new EntityRepository($persister, $metadata);
-
-        $this->assertSame($object, $repository->find(3));
+        $this->assertSame($object, $this->entityRepository->find(3));
     }
 
     public function testFindAll()
     {
-        $persister  = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $metadata   = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $repository = new EntityRepository($persister, $metadata);
+        $result = array(new Book());
 
-        $result = array(
-            new Book()
-        );
+        $this->entityPersister->shouldReceive('loadAll')->once()->with(array(), null, null, null)->andReturn($result);
 
-        $persister->shouldReceive('loadAll')->withArgs(array(array(), null, null, null))->andReturn($result)->once();
-
-        $actual = $repository->findAll();
-
-        $this->assertSame($result, $actual);
+        $this->assertSame($result, $this->entityRepository->findAll());
     }
 
     public function testFindBy()
     {
-        $persister  = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $metadata   = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $repository = new EntityRepository($persister, $metadata);
-
-        $result = array(
-            new Book()
-        );
+        $result = array(new Book());
 
         $criteria = array('id' => 3);
         $orderBy  = array('name' => 'asc');
         $limit    = 10;
         $offset   = 20;
 
-        $persister->shouldReceive('loadAll')->withArgs(array($criteria, $orderBy, $limit, $offset))->andReturn($result)
-            ->once();
+        $this->entityPersister
+            ->shouldReceive('loadAll')
+            ->once()
+            ->with($criteria, $orderBy, $limit, $offset)
+            ->andReturn($result);
 
-        $actual = $repository->findBy($criteria, $orderBy, $limit, $offset);
-
-        $this->assertSame($result, $actual);
+        $this->assertSame($result, $this->entityRepository->findBy($criteria, $orderBy, $limit, $offset));
     }
 
     public function testFindOneBy()
     {
-        $persister  = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $metadata   = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $repository = new EntityRepository($persister, $metadata);
-
         $object = new Book();
 
         $result = array(
@@ -75,23 +76,17 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $criteria = array('id' => 3);
 
-        $persister->shouldReceive('loadAll')->withArgs(array($criteria, null, null, null))->andReturn($result)->once();
+        $this->entityPersister->shouldReceive('loadAll')->once()->with($criteria, null, null, null)->andReturn($result);
 
-        $actual = $repository->findOneBy($criteria);
-
-        $this->assertSame($object, $actual);
+        $this->assertSame($object, $this->entityRepository->findOneBy($criteria));
     }
 
     public function testGetClassName()
     {
         $className = 'FooBar';
 
-        $persister = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $metadata  = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $metadata->shouldReceive('getName')->andReturn($className)->once();
+        $this->classMetadata->shouldReceive('getName')->andReturn($className)->once();
 
-        $repository = new EntityRepository($persister, $metadata);
-
-        $this->assertSame($className, $repository->getClassName());
+        $this->assertSame($className, $this->entityRepository->getClassName());
     }
 }

@@ -11,6 +11,16 @@ abstract class AbstractTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
+    /**
+     * @return Type
+     */
+    abstract protected function getInstance();
+
+    protected function setUp()
+    {
+        $this->type = $this->getInstance();
+    }
+
     public function testNullConvertsToSerializedValue()
     {
         $this->assertNull($this->type->convertToSerializedValue(null));
