@@ -21,37 +21,31 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $this->router        = new Router();
         $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+
+        $this->classMetadata->shouldReceive('hasRoute')->with('resource')->andReturn(true);
+        $this->classMetadata->shouldReceive('hasRoute')->with('collection')->andReturn(true);
+
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
+
+        $this->classMetadata->shouldReceive('getRoute')->with('resource')->andReturn(new Route('books/{id}'));
+        $this->classMetadata->shouldReceive('getRoute')->with('collection')->andReturn(new Route('books'));
+
+        $this->classMetadata->shouldReceive('getSerializedName')->with('id')->andReturn('book_id');
+        $this->classMetadata->shouldReceive('getSerializedName')->with('title')->andReturn('serialized_title');
     }
 
     public function testGenerateWithoutConditionsReturnsCollectionUri()
     {
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->once()->andReturn(array('id'));
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(true);
-        $this->classMetadata->shouldReceive('getRoute')->once()->with('collection')->andReturn(new Route('books'));
-
         $this->assertSame('books', $this->router->generate($this->classMetadata));
     }
 
     public function testGenerateWithIdentifierAsConditionReturnsResourceUri()
     {
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->atLeast(1)->andReturn(array('id'));
-        $this->classMetadata->shouldReceive('getRoute')->once()->with('resource')->andReturn(new Route('books/{id}'));
-        $this->classMetadata->shouldReceive('getSerializedName')->with('id')->andReturn('id');
-
         $this->assertSame('books/3', $this->router->generate($this->classMetadata, array('id' => 3)));
     }
 
     public function testGenerateWithNonIdentifierConditionsReturnsCollectionUriWithQueryString()
     {
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->atLeast(1)->andReturn(array('id'));
-        $this->classMetadata->shouldReceive('getSerializedName')->once()->with('title')->andReturn('serialized_title');
-
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(true);
-        $this->classMetadata->shouldReceive('getRoute')->once()->with('collection')->andReturn(new Route('books'));
-
         $this->assertSame(
             'books?serialized_title=Foo',
             $this->router->generate($this->classMetadata, array('title' => 'Foo'))
@@ -60,15 +54,17 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateWithMissingRouteConfigurationThrowsException()
     {
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(false);
-        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(false);
-        $this->classMetadata->shouldReceive('getName')->once()->andReturn('Foo\Bar');
+        $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+
+        $classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(false);
+        $classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(false);
+        $classMetadata->shouldReceive('getName')->once()->andReturn('Foo\Bar');
 
         $this->setExpectedException(
             'RAPL\RAPL\Mapping\MappingException',
             'A collection route is not configured for class Foo\Bar.'
         );
 
-        $this->router->generate($this->classMetadata, array());
+        $this->router->generate($classMetadata, array());
     }
 }

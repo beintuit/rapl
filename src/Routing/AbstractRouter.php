@@ -25,15 +25,20 @@ abstract class AbstractRouter implements RouterInterface
         $limit = null,
         $offset = null
     ) {
-        $conditions = $this->mapKeys($classMetadata, $conditions);
-        $orderBy    = $this->mapKeys($classMetadata, $orderBy);
-
         $query = new Query($conditions, $orderBy, $limit, $offset);
 
         $route = $this->selectRoute($classMetadata, $query);
 
         $path = $this->buildPath($route->getPattern(), $query);
-        $queryString = $this->buildQueryString($query);
+
+        $mappedQuery = new Query(
+            $this->mapKeys($classMetadata, $query->getConditions()),
+            $this->mapKeys($classMetadata, $query->getOrderBy()),
+            $query->getLimit(),
+            $query->getOffset()
+        );
+
+        $queryString = $this->buildQueryString($mappedQuery);
 
         if (empty($queryString)) {
             return $path;
