@@ -2,124 +2,124 @@
 
 namespace RAPL\Tests\Unit;
 
-use Doctrine\Common\Persistence\Mapping\RuntimeReflectionService;
-use Mockery\MockInterface;
-use RAPL\RAPL\Connection\Connection;
 use RAPL\RAPL\EntityManager;
-use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\UnitOfWork;
-use RAPL\Tests\Fixtures\Entities\Author;
+use RAPL\Tests\Fixtures\Entities\Book;
 
 class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EntityManager|MockInterface
+     * @var \Mockery\MockInterface|EntityManager
      */
-    protected $manager;
+    protected $entityManager;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $classMetadata;
 
     /**
      * @var UnitOfWork
      */
     protected $unitOfWork;
 
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
     protected function setUp()
     {
-        $this->manager = \Mockery::mock('RAPL\RAPL\EntityManager');
-        $router        = \Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
+        $router              = \Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
+        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('newInstance')->andReturn(new Book());
+        $this->classMetadata->shouldReceive('hasField')->with('id')->andReturn(true);
+        $this->classMetadata->shouldReceive('hasField')->with('title')->andReturn(true);
+        $this->classMetadata->shouldReceive('setFieldValue');
+        $this->classMetadata->shouldReceive('getName')->andReturn(self::CLASS_NAME);
 
-        $this->unitOfWork = new UnitOfWork($this->manager, $router);
+        $connection = \Mockery::mock('RAPL\RAPL\Connection\Connection');
+
+        $this->entityManager = \Mockery::mock('RAPL\RAPL\EntityManager');
+        $this->entityManager->shouldReceive('getConnection')->andReturn($connection);
+        $this->entityManager
+            ->shouldReceive('getClassMetadata')
+            ->with(self::CLASS_NAME)
+            ->andReturn($this->classMetadata);
+
+        $this->unitOfWork = new UnitOfWork($this->entityManager, $router);
+
+        $this->entityManager->shouldReceive('getUnitOfWork')->andReturn($this->unitOfWork);
     }
 
     public function testGetEntityPersister()
     {
-        $className     = 'RAPL\Tests\Entities\Library\Book';
-        $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-
-        $connection = new Connection('http://example.com');
-
         $metadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $this->entityManager->shouldReceive('getMetadataFactory')->once()->andReturn($metadataFactory);
 
-        $manager = \Mockery::mock('RAPL\RAPL\EntityManager');
-        $manager->shouldReceive('getClassMetadata')->withArgs(array($className))->andReturn($classMetadata)->once();
-        $manager->shouldReceive('getConnection')->andReturn($connection)->once();
-
-        $router = \Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
-
-        $unitOfWork = new UnitOfWork($manager, $router);
-
-        $manager->shouldReceive('getUnitOfWork')->andReturn($unitOfWork)->once();
-        $manager->shouldReceive('getMetadataFactory')->andReturn($metadataFactory)->once();
-
-        $actual = $unitOfWork->getEntityPersister($className);
-        $this->assertInstanceOf('RAPL\RAPL\Persister\EntityPersister', $actual);
-
-        $second = $unitOfWork->getEntityPersister($className);
-        $this->assertSame($actual, $second);
+        $this->assertInstanceOf(
+            'RAPL\RAPL\Persister\EntityPersister',
+            $this->unitOfWork->getEntityPersister(self::CLASS_NAME)
+        );
     }
 
-    public function testIdentityMap()
+    public function testCallingGetEntityPersisterTwiceReturnsTheSameInstance()
     {
-        $className = 'RAPL\Tests\Entities\Library\Author';
+        $metadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $this->entityManager->shouldReceive('getMetadataFactory')->once()->andReturn($metadataFactory);
 
-        $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
-        $classMetadata->shouldReceive('newInstance')->andReturn(new Author());
-        $classMetadata->shouldReceive('hasField')->withArgs(array('id'))->andReturn(true);
-        $classMetadata->shouldReceive('hasField')->withArgs(array('name'))->andReturn(true);
-        $classMetadata->shouldReceive('setFieldValue');
-        $classMetadata->shouldReceive('getName')->andReturn($className);
-
-        $this->manager->shouldReceive('getClassMetadata')->andReturn($classMetadata);
-
-        $data = array(
-            'id'   => 123,
-            'name' => 'Foo Bar'
+        $this->assertSame(
+            $this->unitOfWork->getEntityPersister(self::CLASS_NAME),
+            $this->unitOfWork->getEntityPersister(self::CLASS_NAME)
         );
+    }
 
-        $entityA = $this->unitOfWork->createEntity($className, $data);
-        $entityB = new Author();
+    public function testIsInIdentityMap()
+    {
+        $entityA = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
+        $entityB = new Book();
 
         $this->assertTrue($this->unitOfWork->isInIdentityMap($entityA));
         $this->assertFalse($this->unitOfWork->isInIdentityMap($entityB));
+    }
 
-        $this->assertFalse($this->unitOfWork->addToIdentityMap($entityA));
+    public function testAddToIdentityMapReturnsFalseIfEntityIsAlreadyInIdentityMap()
+    {
+        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
 
-        $this->assertTrue($this->unitOfWork->removeFromIdentityMap($entityA));
-        $this->assertFalse($this->unitOfWork->isInIdentityMap($entityA));
-        $this->assertFalse($this->unitOfWork->removeFromIdentityMap($entityA));
+        $this->assertFalse($this->unitOfWork->addToIdentityMap($entity));
+    }
+
+    public function testRemoveFromIdentityMapRemovesEntityFromIdentityMap()
+    {
+        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
+
+        $this->assertTrue($this->unitOfWork->removeFromIdentityMap($entity));
+        $this->assertFalse($this->unitOfWork->isInIdentityMap($entity));
+        $this->assertFalse($this->unitOfWork->removeFromIdentityMap($entity));
     }
 
     public function testCreateEntity()
     {
-        $className = 'RAPL\Tests\Fixtures\Entities\Author';
-
-        $classMetadata = new ClassMetadata($className);
-        $classMetadata->mapField(
-            array(
-                'fieldName' => 'name'
-            )
-        );
-
-        $reflService = new RuntimeReflectionService();
-
-        $classMetadata->initializeReflection($reflService);
-        $classMetadata->wakeupReflection($reflService);
-
-        $this->manager->shouldReceive('getClassMetadata')->andReturn($classMetadata);
-
         $data = array(
-            'id'   => 123,
-            'name' => 'Foo Bar'
+            'id'    => 123,
+            'title' => 'Foo Bar'
         );
 
-        /** @var Author $actual */
-        $actual = $this->unitOfWork->createEntity($className, $data);
+        /** @var Book $actual */
+        $actual = $this->unitOfWork->createEntity(self::CLASS_NAME, $data);
 
-        $this->assertInstanceOf($className, $actual);
-        $this->assertSame('Foo Bar', $actual->getName());
+        $this->assertInstanceOf(self::CLASS_NAME, $actual);
+    }
 
-        $copy = $this->unitOfWork->createEntity($className, $data);
+    public function testCallingCreateEntityTwiceReturnsSameInstance()
+    {
+        $data = array(
+            'id'    => 123,
+            'title' => 'Foo Bar'
+        );
 
-        $this->assertSame($actual, $copy);
+        $this->assertSame(
+            $this->unitOfWork->createEntity(self::CLASS_NAME, $data),
+            $this->unitOfWork->createEntity(self::CLASS_NAME, $data)
+        );
     }
 }

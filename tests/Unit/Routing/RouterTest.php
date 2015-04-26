@@ -7,46 +7,68 @@ use RAPL\RAPL\Routing\Router;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGenerateUrl()
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @var \Mockery\MockInterface
+     */
+    private $classMetadata;
+
+    protected function setUp()
     {
-        $resourceRoute   = new Route('books/{id}');
-        $collectionRoute = new Route('books');
-
-        $classMetadataMock = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $classMetadataMock->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
-        $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('resource'))->andReturn(true);
-        $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('collection'))->andReturn(true);
-        $classMetadataMock->shouldReceive('getRoute')->withArgs(array('resource'))->andReturn($resourceRoute);
-        $classMetadataMock->shouldReceive('getRoute')->withArgs(array('collection'))->andReturn($collectionRoute);
-        $classMetadataMock->shouldReceive('getSerializedName')->with('id')->andReturn('id');
-        $classMetadataMock->shouldReceive('getSerializedName')->with('title')->andReturn('serialized_title');
-
-        $router = new Router();
-
-        $actual = $router->generate($classMetadataMock);
-        $this->assertSame('books', $actual);
-
-        $actual = $router->generate($classMetadataMock, array('id' => 3));
-        $this->assertSame('books/3', $actual);
-
-        $actual = $router->generate($classMetadataMock, array('title' => 'Foo'));
-        $this->assertSame('books?serialized_title=Foo', $actual);
+        $this->router        = new Router();
+        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
     }
 
-    public function testMissingRouteConfigurationThrowsException()
+    public function testGenerateWithoutConditionsReturnsCollectionUri()
     {
-        $classMetadataMock = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('resource'))->andReturn(false);
-        $classMetadataMock->shouldReceive('hasRoute')->withArgs(array('collection'))->andReturn(false);
-        $classMetadataMock->shouldReceive('getName')->andReturn('Foo\Bar')->once();
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->once()->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(true);
+        $this->classMetadata->shouldReceive('getRoute')->once()->with('collection')->andReturn(new Route('books'));
 
-        $router = new Router();
+        $this->assertSame('books', $this->router->generate($this->classMetadata));
+    }
+
+    public function testGenerateWithIdentifierAsConditionReturnsResourceUri()
+    {
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->atLeast(1)->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('getRoute')->once()->with('resource')->andReturn(new Route('books/{id}'));
+        $this->classMetadata->shouldReceive('getSerializedName')->with('id')->andReturn('id');
+
+        $this->assertSame('books/3', $this->router->generate($this->classMetadata, array('id' => 3)));
+    }
+
+    public function testGenerateWithNonIdentifierConditionsReturnsCollectionUriWithQueryString()
+    {
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(true);
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->atLeast(1)->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('getSerializedName')->once()->with('title')->andReturn('serialized_title');
+
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(true);
+        $this->classMetadata->shouldReceive('getRoute')->once()->with('collection')->andReturn(new Route('books'));
+
+        $this->assertSame(
+            'books?serialized_title=Foo',
+            $this->router->generate($this->classMetadata, array('title' => 'Foo'))
+        );
+    }
+
+    public function testGenerateWithMissingRouteConfigurationThrowsException()
+    {
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(false);
+        $this->classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(false);
+        $this->classMetadata->shouldReceive('getName')->once()->andReturn('Foo\Bar');
 
         $this->setExpectedException(
             'RAPL\RAPL\Mapping\MappingException',
             'A collection route is not configured for class Foo\Bar.'
         );
 
-        $router->generate($classMetadataMock, array());
+        $this->router->generate($this->classMetadata, array());
     }
 }

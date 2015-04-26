@@ -2,13 +2,17 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use RAPL\RAPL\Types\StringType;
 use RAPL\RAPL\Types\Type;
 
 class StringTypeTest extends AbstractTypeTest
 {
-    protected function setUp()
+    /**
+     * @return StringType
+     */
+    protected function getInstance()
     {
-        $this->type = Type::getType('string');
+        return Type::getType('string');
     }
 
     public function testStringConvertsToSerializedValue()

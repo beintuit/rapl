@@ -2,13 +2,17 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use RAPL\RAPL\Types\DateTimeType;
 use RAPL\RAPL\Types\Type;
 
 class DateTimeTypeTest extends AbstractTypeTest
 {
-    protected function setUp()
+    /**
+     * @return DateTimeType
+     */
+    protected function getInstance()
     {
-        $this->type = Type::getType('datetime');
+        return Type::getType('datetime');
     }
 
     public function testDateTimeConvertsToSerializedValue()

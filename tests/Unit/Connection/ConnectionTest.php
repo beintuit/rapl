@@ -6,35 +6,39 @@ use RAPL\RAPL\Connection\Connection;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateRequest()
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    const BASE_URL = 'http://example.com/api/';
+
+    protected function setUp()
     {
-        $baseUrl    = 'http://example.com/api/';
-        $connection = new Connection($baseUrl);
-
-        $actual = $connection->createRequest('GET', 'foo/bar');
-
-        $this->assertInstanceOf('Guzzle\Http\Message\RequestInterface', $actual);
-        $this->assertSame('http://example.com/api/foo/bar', $actual->getUrl());
+        $this->connection = new Connection(self::BASE_URL);
     }
 
-    public function testSendRequest()
+    public function testCreateRequestReturnsRequestObject()
+    {
+        $request = $this->connection->createRequest('GET', 'foo/bar');
+
+        $this->assertInstanceOf('Guzzle\Http\Message\RequestInterface', $request);
+        $this->assertSame(self::BASE_URL . 'foo/bar', $request->getUrl());
+    }
+
+    public function testSendRequestInvokesSendMethodOnRequest()
     {
         $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-        $request->shouldReceive('send');
+        $request->shouldReceive('send')->once();
 
-        $baseUrl    = 'http://example.com/api/';
-        $connection = new Connection($baseUrl);
-
-        $connection->sendRequest($request);
+        $this->connection->sendRequest($request);
     }
 
     public function testAddSubscriber()
     {
         $subscriber = \Mockery::mock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $subscriber->shouldReceive('getSubscribedEvents')->andReturn(array());
+        $subscriber->shouldReceive('getSubscribedEvents')->once()->andReturn(array());
 
-        $connection = new Connection('http://example.com/api/');
-
-        $connection->addSubscriber($subscriber);
+        $this->connection->addSubscriber($subscriber);
     }
 }
