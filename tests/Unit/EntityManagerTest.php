@@ -163,7 +163,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        $this->unitOfWork->shouldReceive('initializeObject')->withArgs(array($object))->once();
+        $this->unitOfWork->shouldReceive('initializeObject')->withArgs([$object])->once();
 
         $this->entityManager->initializeObject($object);
     }
@@ -172,9 +172,9 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        $this->unitOfWork->shouldReceive('isScheduledForInsert')->withArgs(array($object))->andReturn(false)->once();
-        $this->unitOfWork->shouldReceive('isInIdentityMap')->withArgs(array($object))->andReturn(true)->once();
-        $this->unitOfWork->shouldReceive('isScheduledForDelete')->withArgs(array($object))->andReturn(false)->once();
+        $this->unitOfWork->shouldReceive('isScheduledForInsert')->withArgs([$object])->andReturn(false)->once();
+        $this->unitOfWork->shouldReceive('isInIdentityMap')->withArgs([$object])->andReturn(true)->once();
+        $this->unitOfWork->shouldReceive('isScheduledForDelete')->withArgs([$object])->andReturn(false)->once();
 
         $this->assertTrue($this->entityManager->contains($object));
     }

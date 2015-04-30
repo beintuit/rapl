@@ -9,7 +9,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testRoute()
     {
         $pattern   = 'foo/bar/{id}';
-        $envelopes = array('foo', 'bar');
+        $envelopes = ['foo', 'bar'];
 
         $route = new Route($pattern, false, $envelopes);
 

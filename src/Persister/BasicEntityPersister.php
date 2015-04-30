@@ -108,7 +108,7 @@ class BasicEntityPersister implements EntityPersister
      *
      * @return array
      */
-    public function loadAll(array $conditions = array(), array $orderBy = array(), $limit = null, $offset = null)
+    public function loadAll(array $conditions = [], array $orderBy = [], $limit = null, $offset = null)
     {
         $uri      = $this->getUri($conditions, $orderBy, $limit, $offset);
         $route    = $this->getRoute($conditions, $orderBy, $limit, $offset);
@@ -132,7 +132,7 @@ class BasicEntityPersister implements EntityPersister
      *
      * @return string
      */
-    private function getUri(array $conditions, array $orderBy = array(), $limit = null, $offset = null)
+    private function getUri(array $conditions, array $orderBy = [], $limit = null, $offset = null)
     {
         return $this->router->generate($this->classMetadata, $conditions, $orderBy, $limit, $offset);
     }
@@ -145,7 +145,7 @@ class BasicEntityPersister implements EntityPersister
      *
      * @return \RAPL\RAPL\Mapping\Route
      */
-    private function getRoute(array $conditions, array $orderBy = array(), $limit = null, $offset = null)
+    private function getRoute(array $conditions, array $orderBy = [], $limit = null, $offset = null)
     {
         return $this->router->getRoute($this->classMetadata, $conditions, $orderBy, $limit, $offset);
     }

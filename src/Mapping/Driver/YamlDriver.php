@@ -42,13 +42,13 @@ class YamlDriver extends FileDriver
         if (isset($element['identifiers'])) {
             foreach ($element['identifiers'] as $fieldName => $fieldElement) {
                 $metadata->mapField(
-                    array(
+                    [
                         'fieldName'      => $fieldName,
                         'type'           => (isset($fieldElement['type'])) ? $fieldElement['type'] : null,
                         'serializedName' => (isset($fieldElement['serializedName'])) ?
                             (string) $fieldElement['serializedName'] : null,
                         'id'             => true,
-                    )
+                    ]
                 );
             }
         }
@@ -56,12 +56,12 @@ class YamlDriver extends FileDriver
         if (isset($element['fields'])) {
             foreach ($element['fields'] as $fieldName => $mapping) {
                 $metadata->mapField(
-                    array(
+                    [
                         'fieldName'      => $fieldName,
                         'type'           => (isset($mapping['type'])) ? $mapping['type'] : null,
                         'serializedName' => (isset($mapping['serializedName'])) ? (string) $mapping['serializedName'] :
                             null,
-                    )
+                    ]
                 );
             }
         }
@@ -69,12 +69,12 @@ class YamlDriver extends FileDriver
         if (isset($element['embedOne'])) {
             foreach ($element['embedOne'] as $fieldName => $embedElement) {
                 $metadata->mapEmbedOne(
-                    array(
+                    [
                         'targetEntity'   => (string) $embedElement['targetEntity'],
                         'fieldName'      => $fieldName,
                         'serializedName' => (isset($embedElement['serializedName'])) ?
                             (string) $embedElement['serializedName'] : null,
-                    )
+                    ]
                 );
             }
         }
@@ -86,10 +86,10 @@ class YamlDriver extends FileDriver
      */
     protected function setRoutes(ClassMetadata $metadata, array $element)
     {
-        foreach (array('resource', 'collection') as $type) {
+        foreach (['resource', 'collection'] as $type) {
             if (isset($element[$type]) && isset($element[$type]['route'])) {
                 $pattern   = $element[$type]['route'];
-                $envelopes = (isset($element[$type]['envelopes'])) ? $element[$type]['envelopes'] : array();
+                $envelopes = (isset($element[$type]['envelopes'])) ? $element[$type]['envelopes'] : [];
 
                 if ($type === 'resource') {
                     $returnsCollection = false;

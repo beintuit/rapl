@@ -20,8 +20,8 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->classMetadata = new ClassMetadata(self::CLASS_NAME);
 
-        $this->classMetadata->mapField(array('fieldName' => 'id', 'type' => 'integer', 'id' => true));
-        $this->classMetadata->mapField(array('fieldName' => 'title', 'serializedName' => 'book_title'));
+        $this->classMetadata->mapField(['fieldName' => 'id', 'type' => 'integer', 'id' => true]);
+        $this->classMetadata->mapField(['fieldName' => 'title', 'serializedName' => 'book_title']);
 
         $reflService = new RuntimeReflectionService();
 
@@ -70,7 +70,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFieldNamesReturnsMappedFieldNames()
     {
-        $this->assertSame(array('id', 'title'), $this->classMetadata->getFieldNames());
+        $this->assertSame(['id', 'title'], $this->classMetadata->getFieldNames());
     }
 
     public function testGetFieldNameReturnsFieldNameForSerializedName()
@@ -81,7 +81,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldMappingReturnsFieldMapping()
     {
         $this->assertSame(
-            array('fieldName' => 'title', 'serializedName' => 'book_title', 'type' => 'string'),
+            ['fieldName' => 'title', 'serializedName' => 'book_title', 'type' => 'string'],
             $this->classMetadata->getFieldMapping('title')
         );
     }
@@ -95,8 +95,8 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIdentifierFieldNames()
     {
-        $this->assertEquals(array('id'), $this->classMetadata->getIdentifierFieldNames());
-        $this->assertEquals(array('id'), $this->classMetadata->getIdentifier());
+        $this->assertEquals(['id'], $this->classMetadata->getIdentifierFieldNames());
+        $this->assertEquals(['id'], $this->classMetadata->getIdentifier());
     }
 
     public function testGetTypeOfField()
@@ -115,11 +115,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testIsAssociationInverseSide()
     {
         $this->classMetadata->mapField(
-            array(
+            [
                 'fieldName'    => 'foo',
                 'association'  => ClassMetadata::EMBED_ONE,
                 'isOwningSide' => false,
-            )
+            ]
         );
 
         $this->assertTrue($this->classMetadata->isAssociationInverseSide('foo'));
@@ -128,11 +128,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGetAssociationMappedByTargetField()
     {
         $this->classMetadata->mapField(
-            array(
+            [
                 'fieldName'   => 'foo',
                 'association' => ClassMetadata::EMBED_ONE,
                 'mappedBy'    => 'bar',
-            )
+            ]
         );
 
         $this->assertSame('bar', $this->classMetadata->getAssociationMappedByTargetField('foo'));
@@ -144,14 +144,14 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $object->setId(123);
 
         $actual = $this->classMetadata->getIdentifierValues($object);
-        $this->assertSame(array('id' => 123), $actual);
+        $this->assertSame(['id' => 123], $actual);
     }
 
     public function testMapFieldValidatesAndCompletesFieldMapping()
     {
-        $mapping = array(
+        $mapping = [
             'fieldName' => 'test',
-        );
+        ];
 
         $this->classMetadata->mapField($mapping);
 
@@ -164,17 +164,17 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $this->classMetadata->mapField(array());
+        $this->classMetadata->mapField([]);
     }
 
     public function testEmbedOne()
     {
         $fieldName = 'author';
 
-        $mapping = array(
+        $mapping = [
             'fieldName'    => $fieldName,
             'targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author',
-        );
+        ];
 
         $this->classMetadata->mapEmbedOne($mapping);
 
@@ -183,7 +183,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->classMetadata->hasAssociation($fieldName));
         $this->assertTrue($this->classMetadata->isSingleValuedAssociation($fieldName));
         $this->assertFalse($this->classMetadata->isCollectionValuedAssociation($fieldName));
-        $this->assertSame(array('author'), $this->classMetadata->getAssociationNames());
+        $this->assertSame(['author'], $this->classMetadata->getAssociationNames());
         $this->assertSame(
             'RAPL\Tests\Fixtures\Entities\Author',
             $this->classMetadata->getAssociationTargetClass($fieldName)
@@ -194,14 +194,14 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $this->classMetadata->mapEmbedOne(array('fieldName' => 'author'));
+        $this->classMetadata->mapEmbedOne(['fieldName' => 'author']);
     }
 
     public function testMapEmbedOneWithoutFieldNameThrowsException()
     {
         $this->setExpectedException('RAPL\RAPL\Mapping\MappingException');
 
-        $this->classMetadata->mapEmbedOne(array('targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author'));
+        $this->classMetadata->mapEmbedOne(['targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author']);
     }
 
     public function testNewInstance()
@@ -223,8 +223,8 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->classMetadata->getRoute('resource'));
 
-        $resourceRoute   = new Route('books/{id}', array('results', 0));
-        $collectionRoute = new Route('books', array('results'));
+        $resourceRoute   = new Route('books/{id}', ['results', 0]);
+        $collectionRoute = new Route('books', ['results']);
 
         $this->classMetadata->setRoute('resource', $resourceRoute);
         $this->classMetadata->setRoute('collection', $collectionRoute);

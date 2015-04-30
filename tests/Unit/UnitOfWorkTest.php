@@ -29,7 +29,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     {
         $router              = \Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
         $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(['id']);
         $this->classMetadata->shouldReceive('newInstance')->andReturn(new Book());
         $this->classMetadata->shouldReceive('hasField')->with('id')->andReturn(true);
         $this->classMetadata->shouldReceive('hasField')->with('title')->andReturn(true);
@@ -74,7 +74,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testIsInIdentityMap()
     {
-        $entityA = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
+        $entityA = $this->unitOfWork->createEntity(self::CLASS_NAME, ['id' => 123, 'title' => 'Foo']);
         $entityB = new Book();
 
         $this->assertTrue($this->unitOfWork->isInIdentityMap($entityA));
@@ -83,14 +83,14 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testAddToIdentityMapReturnsFalseIfEntityIsAlreadyInIdentityMap()
     {
-        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
+        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, ['id' => 123, 'title' => 'Foo']);
 
         $this->assertFalse($this->unitOfWork->addToIdentityMap($entity));
     }
 
     public function testRemoveFromIdentityMapRemovesEntityFromIdentityMap()
     {
-        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, array('id' => 123, 'title' => 'Foo'));
+        $entity = $this->unitOfWork->createEntity(self::CLASS_NAME, ['id' => 123, 'title' => 'Foo']);
 
         $this->assertTrue($this->unitOfWork->removeFromIdentityMap($entity));
         $this->assertFalse($this->unitOfWork->isInIdentityMap($entity));
@@ -99,10 +99,10 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEntity()
     {
-        $data = array(
+        $data = [
             'id'    => 123,
             'title' => 'Foo Bar',
-        );
+        ];
 
         /** @var Book $actual */
         $actual = $this->unitOfWork->createEntity(self::CLASS_NAME, $data);
@@ -112,10 +112,10 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testCallingCreateEntityTwiceReturnsSameInstance()
     {
-        $data = array(
+        $data = [
             'id'    => 123,
             'title' => 'Foo Bar',
-        );
+        ];
 
         $this->assertSame(
             $this->unitOfWork->createEntity(self::CLASS_NAME, $data),

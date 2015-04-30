@@ -8,8 +8,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 {
     public function testQuery()
     {
-        $conditions = array('foo' => 'bar');
-        $orderBy    = array('foo' => 'desc');
+        $conditions = ['foo' => 'bar'];
+        $orderBy    = ['foo' => 'desc'];
         $limit      = 5;
         $offset     = 0;
 
@@ -23,11 +23,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveCondition()
     {
-        $conditions = array('foo' => 'bar', 'bar' => 'barbaz');
+        $conditions = ['foo' => 'bar', 'bar' => 'barbaz'];
 
         $query = new Query($conditions);
 
         $query->removeCondition('foo');
-        $this->assertSame(array('bar' => 'barbaz'), $query->getConditions());
+        $this->assertSame(['bar' => 'barbaz'], $query->getConditions());
     }
 }

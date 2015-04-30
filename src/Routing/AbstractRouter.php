@@ -20,8 +20,8 @@ abstract class AbstractRouter implements RouterInterface
      */
     public function generate(
         ClassMetadata $classMetadata,
-        array $conditions = array(),
-        array $orderBy = array(),
+        array $conditions = [],
+        array $orderBy = [],
         $limit = null,
         $offset = null
     ) {
@@ -79,8 +79,8 @@ abstract class AbstractRouter implements RouterInterface
      */
     public function getRoute(
         ClassMetadata $classMetadata,
-        array $conditions = array(),
-        array $orderBy = array(),
+        array $conditions = [],
+        array $orderBy = [],
         $limit = null,
         $offset = null
     ) {

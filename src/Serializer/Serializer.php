@@ -43,8 +43,8 @@ class Serializer implements SerializerInterface
         $this->unitOfWork           = $unitOfWork;
         $this->classMetadataFactory = $metadataFactory;
 
-        $normalizers      = array(new GetSetMethodNormalizer());
-        $encoders         = array(new JsonEncoder());
+        $normalizers      = [new GetSetMethodNormalizer()];
+        $encoders         = [new JsonEncoder()];
         $this->serializer = new SymfonySerializer($normalizers, $encoders);
     }
 
@@ -57,16 +57,16 @@ class Serializer implements SerializerInterface
      *
      * @return array
      */
-    public function deserialize($data, $isCollection, array $envelopes = array())
+    public function deserialize($data, $isCollection, array $envelopes = [])
     {
         $data = $this->decode($data);
         $data = $this->unwrap($data, $envelopes);
 
         if (!$isCollection) {
-            $data = array($data);
+            $data = [$data];
         }
 
-        $hydratedEntities = array();
+        $hydratedEntities = [];
 
         foreach ($data as $entityData) {
             $entityData = $this->mapFromSerialized($entityData);
@@ -111,7 +111,7 @@ class Serializer implements SerializerInterface
             if (isset($data[$envelope])) {
                 $data = $data[$envelope];
             } else {
-                return array();
+                return [];
             }
         }
 
@@ -125,7 +125,7 @@ class Serializer implements SerializerInterface
      */
     private function mapFromSerialized(array $data)
     {
-        $mappedEntityData = array();
+        $mappedEntityData = [];
 
         foreach ($data as $serializedName => $value) {
             if ($this->classMetadata->hasField($this->classMetadata->getFieldName($serializedName))) {
@@ -133,7 +133,7 @@ class Serializer implements SerializerInterface
                 $fieldMapping = $this->classMetadata->getFieldMapping($fieldName);
 
                 if (isset($fieldMapping['association'])) {
-                    $embedded = array();
+                    $embedded = [];
 
                     $associationMetadata   = $this->classMetadataFactory->getMetadataFor($fieldMapping['targetEntity']);
                     $associationSerializer = new Serializer(

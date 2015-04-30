@@ -17,14 +17,14 @@ class Route
     /**
      * @var array
      */
-    private $envelopes = array();
+    private $envelopes = [];
 
     /**
      * @param string $pattern   The pattern used to build a URI
      * @param bool   $returnsCollection
      * @param array  $envelopes Envelopes in which the result data is wrapped
      */
-    public function __construct($pattern, $returnsCollection = true, $envelopes = array())
+    public function __construct($pattern, $returnsCollection = true, $envelopes = [])
     {
         $this->pattern           = $pattern;
         $this->returnsCollection = $returnsCollection;

@@ -49,7 +49,7 @@ class UnitOfWork
      *
      * @var array
      */
-    private $persisters = array();
+    private $persisters = [];
 
     /**
      * The identity map that holds references to all managed entities that have
@@ -59,7 +59,7 @@ class UnitOfWork
      *
      * @var array
      */
-    private $identityMap = array();
+    private $identityMap = [];
 
     /**
      * Map of all identifiers of managed entities.
@@ -67,7 +67,7 @@ class UnitOfWork
      *
      * @var array
      */
-    private $entityIdentifiers = array();
+    private $entityIdentifiers = [];
 
     /**
      * @param ObjectManager   $manager
@@ -258,7 +258,7 @@ class UnitOfWork
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $this->manager->getClassMetadata($className);
 
-        $id = array();
+        $id = [];
         foreach ($classMetadata->getIdentifierFieldNames() as $idField) {
             $id[$idField] = $data[$idField];
         }
