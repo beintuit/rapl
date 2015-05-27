@@ -81,7 +81,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             'stringData',
             array(
                 'serializedName' => 'string',
-                'type'           => 'string'
+                'type'           => 'string',
             )
         );
 
@@ -131,7 +131,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             'stringData',
             array(
                 'serializedName' => 'string',
-                'type'           => 'string'
+                'type'           => 'string',
             )
         );
 
@@ -171,7 +171,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
                 'embedded'       => true,
                 'type'           => 'one',
                 'association'    => ClassMetadata::EMBED_ONE,
-                'targetEntity'   => 'Foo\BarBaz'
+                'targetEntity'   => 'Foo\BarBaz',
             )
         );
 
@@ -210,7 +210,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
                 'embedded'       => true,
                 'type'           => 'one',
                 'association'    => ClassMetadata::EMBED_ONE,
-                'targetEntity'   => 'Foo\BarBaz'
+                'targetEntity'   => 'Foo\BarBaz',
             )
         );
 

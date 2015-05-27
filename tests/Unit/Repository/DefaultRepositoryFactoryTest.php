@@ -2,10 +2,13 @@
 
 namespace RAPL\Tests\Unit\Repository;
 
+use RAPL\RAPL\EntityManagerInterface;
 use RAPL\RAPL\Repository\DefaultRepositoryFactory;
 
 class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = 'SomeClass';
+
     /**
      * @var DefaultRepositoryFactory
      */
@@ -17,11 +20,9 @@ class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     private $unitOfWork;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|EntityManagerInterface
      */
     private $entityManager;
-
-    const CLASS_NAME = 'SomeClass';
 
     protected function setUp()
     {

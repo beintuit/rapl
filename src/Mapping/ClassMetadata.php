@@ -266,7 +266,8 @@ class ClassMetadata implements ClassMetadataInterface
      */
     public function getSerializedName($fieldName)
     {
-        return isset($this->fieldMappings[$fieldName]['serializedName']) ? $this->fieldMappings[$fieldName]['serializedName'] : $fieldName;
+        return isset($this->fieldMappings[$fieldName]['serializedName']) ?
+            $this->fieldMappings[$fieldName]['serializedName'] : $fieldName;
     }
 
     /**
@@ -352,7 +353,7 @@ class ClassMetadata implements ClassMetadataInterface
      */
     public function isAssociationInverseSide($assocName)
     {
-        return isset($this->associationMappings[$assocName]) && ! $this->associationMappings[$assocName]['isOwningSide'];
+        return isset($this->associationMappings[$assocName]) && !$this->associationMappings[$assocName]['isOwningSide'];
     }
 
     /**

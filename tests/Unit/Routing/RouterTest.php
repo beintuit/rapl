@@ -2,6 +2,7 @@
 
 namespace RAPL\Tests\Unit\Routing;
 
+use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Mapping\Route;
 use RAPL\RAPL\Routing\Router;
 
@@ -13,7 +14,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     private $router;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|ClassMetadata
      */
     private $classMetadata;
 

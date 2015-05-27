@@ -6,6 +6,7 @@ use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use RAPL\RAPL\Configuration;
+use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
@@ -14,9 +15,12 @@ use RAPL\Tests\Fixtures\Entities\Book;
 
 class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    private $entityManager;
-
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
 
     /**
      * @var EntityRepository
@@ -24,7 +28,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|ConnectionInterface
      */
     private $connection;
 
@@ -33,7 +37,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
 
         $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
+        $paths         = array(__DIR__.'/../Fixtures/config');
         $driver        = new YamlDriver($paths, '.rapl.yml');
         $configuration->setMetadataDriver($driver);
 

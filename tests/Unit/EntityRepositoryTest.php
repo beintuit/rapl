@@ -3,6 +3,8 @@
 namespace RAPL\Tests\Unit;
 
 use RAPL\RAPL\EntityRepository;
+use RAPL\RAPL\Mapping\ClassMetadata;
+use RAPL\RAPL\Persister\EntityPersister;
 use RAPL\Tests\Fixtures\Entities\Book;
 
 class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -13,12 +15,12 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private $entityRepository;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|EntityPersister
      */
     private $entityPersister;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|ClassMetadata
      */
     private $classMetadata;
 
@@ -70,9 +72,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Book();
 
-        $result = array(
-            $object
-        );
+        $result = array($object);
 
         $criteria = array('id' => 3);
 

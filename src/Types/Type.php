@@ -7,10 +7,15 @@ use RAPL\RAPL\Mapping\MappingException;
 abstract class Type
 {
     const TYPE_ARRAY = 'array';
+
     const TYPE_BOOLEAN = 'boolean';
+
     const TYPE_DATETIME = 'datetime';
+
     const TYPE_FLOAT = 'float';
+
     const TYPE_INTEGER = 'integer';
+
     const TYPE_STRING = 'string';
 
     /**
@@ -22,7 +27,7 @@ abstract class Type
         self::TYPE_DATETIME => 'RAPL\RAPL\Types\DateTimeType',
         self::TYPE_FLOAT    => 'RAPL\RAPL\Types\FloatType',
         self::TYPE_INTEGER  => 'RAPL\RAPL\Types\IntegerType',
-        self::TYPE_STRING   => 'RAPL\RAPL\Types\StringType'
+        self::TYPE_STRING   => 'RAPL\RAPL\Types\StringType',
     );
 
     /**
@@ -35,30 +40,6 @@ abstract class Type
      */
     final private function __construct()
     {
-    }
-
-    /**
-     * Converts a value from its PHP representation to its serialized representation
-     *
-     * @param mixed $value The value to convert
-     *
-     * @return mixed The serialized representation of the value
-     */
-    public function convertToSerializedValue($value)
-    {
-        return $value;
-    }
-
-    /**
-     * Converts a value from its serialized representation (JSON / XML / etc.) to its PHP representation
-     *
-     * @param mixed $value The value to convert
-     *
-     * @return mixed The PHP representation of the value
-     */
-    public function convertToPhpValue($value)
-    {
-        return $value;
     }
 
     /**
@@ -91,5 +72,29 @@ abstract class Type
     public static function addType($name, $className)
     {
         self::$typesMap[$name] = $className;
+    }
+
+    /**
+     * Converts a value from its PHP representation to its serialized representation
+     *
+     * @param mixed $value The value to convert
+     *
+     * @return mixed The serialized representation of the value
+     */
+    public function convertToSerializedValue($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Converts a value from its serialized representation (JSON / XML / etc.) to its PHP representation
+     *
+     * @param mixed $value The value to convert
+     *
+     * @return mixed The PHP representation of the value
+     */
+    public function convertToPhpValue($value)
+    {
+        return $value;
     }
 }

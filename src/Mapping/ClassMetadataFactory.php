@@ -43,7 +43,7 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
      */
     protected function getFqcnFromAlias($namespaceAlias, $simpleClassName)
     {
-        return $this->manager->getConfiguration()->getEntityNamespace($namespaceAlias) . '\\' . $simpleClassName;
+        return $this->manager->getConfiguration()->getEntityNamespace($namespaceAlias).'\\'.$simpleClassName;
     }
 
     /**

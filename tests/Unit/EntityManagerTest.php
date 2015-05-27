@@ -2,28 +2,32 @@
 
 namespace RAPL\Tests\Unit;
 
+use RAPL\RAPL\Configuration;
+use RAPL\RAPL\Connection\ConnectionInterface;
+use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\ClassMetadata;
+use RAPL\RAPL\UnitOfWork;
 use RAPL\Tests\Mocks\EntityManagerMock;
 
 class EntityManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|EntityRepository
      */
     private $repository;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|ConnectionInterface
      */
     private $connection;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|Configuration
      */
     private $configuration;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|UnitOfWork
      */
     private $unitOfWork;
 

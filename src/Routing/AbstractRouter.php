@@ -43,7 +43,7 @@ abstract class AbstractRouter implements RouterInterface
         if (empty($queryString)) {
             return $path;
         } else {
-            return $path . '?' . $queryString;
+            return $path.'?'.$queryString;
         }
     }
 
@@ -57,9 +57,12 @@ abstract class AbstractRouter implements RouterInterface
     {
         $array = array_flip($array);
 
-        $array = array_map(function ($fieldName) use ($classMetadata) {
-            return $classMetadata->getSerializedName($fieldName);
-        }, $array);
+        $array = array_map(
+            function ($fieldName) use ($classMetadata) {
+                return $classMetadata->getSerializedName($fieldName);
+            },
+            $array
+        );
 
         return array_flip($array);
     }

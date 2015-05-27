@@ -6,6 +6,10 @@ use RAPL\RAPL\Mapping\ClassMetadataFactory;
 
 class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    CONST CLASS_ALIAS = 'Foo:Book';
+
     /**
      * @var \Mockery\MockInterface
      */
@@ -25,10 +29,6 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
      * @var ClassMetadataFactory
      */
     private $classMetadataFactory;
-
-    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
-
-    CONST CLASS_ALIAS = 'Foo:Book';
 
     protected function setUp()
     {

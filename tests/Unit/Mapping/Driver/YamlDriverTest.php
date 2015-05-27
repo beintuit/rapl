@@ -6,6 +6,8 @@ use RAPL\RAPL\Mapping\Driver\YamlDriver;
 
 class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
     /**
      * @var YamlDriver
      */
@@ -16,11 +18,9 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
      */
     private $classMetadata;
 
-    const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
-
     protected function setUp()
     {
-        $paths               = array(__DIR__ . '/../../../Fixtures/config/');
+        $paths               = array(__DIR__.'/../../../Fixtures/config/');
         $this->mappingDriver = new YamlDriver($paths);
 
         $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
@@ -47,7 +47,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
                     'fieldName'      => 'id',
                     'type'           => 'integer',
                     'serializedName' => null,
-                    'id'             => true
+                    'id'             => true,
                 )
             );
 
@@ -58,7 +58,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
                 array(
                     'fieldName'      => 'title',
                     'type'           => 'string',
-                    'serializedName' => null
+                    'serializedName' => null,
                 )
             );
 
@@ -69,7 +69,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
                 array(
                     'fieldName'      => 'isbn',
                     'type'           => null,
-                    'serializedName' => null
+                    'serializedName' => null,
                 )
             );
 
@@ -80,7 +80,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
                 array(
                     'targetEntity'   => 'RAPL\Tests\Fixtures\Entities\Author',
                     'fieldName'      => 'author',
-                    'serializedName' => null
+                    'serializedName' => null,
                 )
             );
 
