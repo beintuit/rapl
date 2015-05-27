@@ -6,6 +6,7 @@ use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use RAPL\RAPL\Configuration;
+use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
@@ -16,6 +17,9 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
     /**
@@ -24,7 +28,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|ConnectionInterface
      */
     private $connection;
 

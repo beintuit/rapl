@@ -2,6 +2,7 @@
 
 namespace RAPL\Tests\Unit\Repository;
 
+use RAPL\RAPL\EntityManagerInterface;
 use RAPL\RAPL\Repository\DefaultRepositoryFactory;
 
 class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +20,7 @@ class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     private $unitOfWork;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface|EntityManagerInterface
      */
     private $entityManager;
 
