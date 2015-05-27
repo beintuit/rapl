@@ -14,9 +14,9 @@ use RAPL\Tests\Fixtures\Entities\Book;
 
 class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    private $entityManager;
-
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
+
+    private $entityManager;
 
     /**
      * @var EntityRepository
@@ -33,7 +33,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
 
         $configuration = new Configuration();
-        $paths         = array(__DIR__ . '/../Fixtures/config');
+        $paths         = array(__DIR__.'/../Fixtures/config');
         $driver        = new YamlDriver($paths, '.rapl.yml');
         $configuration->setMetadataDriver($driver);
 

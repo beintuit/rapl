@@ -118,7 +118,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             array(
                 'fieldName'    => 'foo',
                 'association'  => ClassMetadata::EMBED_ONE,
-                'isOwningSide' => false
+                'isOwningSide' => false,
             )
         );
 
@@ -131,7 +131,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             array(
                 'fieldName'   => 'foo',
                 'association' => ClassMetadata::EMBED_ONE,
-                'mappedBy'    => 'bar'
+                'mappedBy'    => 'bar',
             )
         );
 
@@ -150,7 +150,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testMapFieldValidatesAndCompletesFieldMapping()
     {
         $mapping = array(
-            'fieldName' => 'test'
+            'fieldName' => 'test',
         );
 
         $this->classMetadata->mapField($mapping);
@@ -173,7 +173,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $mapping = array(
             'fieldName'    => $fieldName,
-            'targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author'
+            'targetEntity' => 'RAPL\Tests\Fixtures\Entities\Author',
         );
 
         $this->classMetadata->mapEmbedOne($mapping);

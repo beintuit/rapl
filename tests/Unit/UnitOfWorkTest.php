@@ -101,7 +101,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     {
         $data = array(
             'id'    => 123,
-            'title' => 'Foo Bar'
+            'title' => 'Foo Bar',
         );
 
         /** @var Book $actual */
@@ -114,7 +114,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     {
         $data = array(
             'id'    => 123,
-            'title' => 'Foo Bar'
+            'title' => 'Foo Bar',
         );
 
         $this->assertSame(

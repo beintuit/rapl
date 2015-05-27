@@ -45,8 +45,9 @@ class YamlDriver extends FileDriver
                     array(
                         'fieldName'      => $fieldName,
                         'type'           => (isset($fieldElement['type'])) ? $fieldElement['type'] : null,
-                        'serializedName' => (isset($fieldElement['serializedName'])) ? (string) $fieldElement['serializedName'] : null,
-                        'id'             => true
+                        'serializedName' => (isset($fieldElement['serializedName'])) ?
+                            (string) $fieldElement['serializedName'] : null,
+                        'id'             => true,
                     )
                 );
             }
@@ -58,7 +59,8 @@ class YamlDriver extends FileDriver
                     array(
                         'fieldName'      => $fieldName,
                         'type'           => (isset($mapping['type'])) ? $mapping['type'] : null,
-                        'serializedName' => (isset($mapping['serializedName'])) ? (string) $mapping['serializedName'] : null
+                        'serializedName' => (isset($mapping['serializedName'])) ? (string) $mapping['serializedName'] :
+                            null,
                     )
                 );
             }
@@ -70,7 +72,8 @@ class YamlDriver extends FileDriver
                     array(
                         'targetEntity'   => (string) $embedElement['targetEntity'],
                         'fieldName'      => $fieldName,
-                        'serializedName' => (isset($embedElement['serializedName'])) ? (string) $embedElement['serializedName'] : null
+                        'serializedName' => (isset($embedElement['serializedName'])) ?
+                            (string) $embedElement['serializedName'] : null,
                     )
                 );
             }

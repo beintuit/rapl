@@ -6,6 +6,8 @@ use RAPL\RAPL\Repository\DefaultRepositoryFactory;
 
 class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = 'SomeClass';
+
     /**
      * @var DefaultRepositoryFactory
      */
@@ -20,8 +22,6 @@ class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
      * @var \Mockery\MockInterface
      */
     private $entityManager;
-
-    const CLASS_NAME = 'SomeClass';
 
     protected function setUp()
     {

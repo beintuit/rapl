@@ -6,12 +6,12 @@ use RAPL\RAPL\Connection\Connection;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
+    const BASE_URL = 'http://example.com/api/';
+
     /**
      * @var Connection
      */
     private $connection;
-
-    const BASE_URL = 'http://example.com/api/';
 
     protected function setUp()
     {
@@ -23,7 +23,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $request = $this->connection->createRequest('GET', 'foo/bar');
 
         $this->assertInstanceOf('Guzzle\Http\Message\RequestInterface', $request);
-        $this->assertSame(self::BASE_URL . 'foo/bar', $request->getUrl());
+        $this->assertSame(self::BASE_URL.'foo/bar', $request->getUrl());
     }
 
     public function testSendRequestInvokesSendMethodOnRequest()

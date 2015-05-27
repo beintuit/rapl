@@ -70,9 +70,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Book();
 
-        $result = array(
-            $object
-        );
+        $result = array($object);
 
         $criteria = array('id' => 3);
 
