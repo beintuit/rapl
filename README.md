@@ -16,6 +16,10 @@ It implements the same interfaces, but allows you to store and retrieve entities
 [![Coverage Status](https://img.shields.io/coveralls/rapl/rapl.svg?style=flat)](https://coveralls.io/r/rapl/rapl)
 [![Code Quality](https://img.shields.io/scrutinizer/g/rapl/rapl.svg?style=flat)](https://scrutinizer-ci.com/g/rapl/rapl/)
 
+## Requirements
+
+RAPL requires PHP 5.4 or higher.
+
 ## Installation
 
 RAPL can be installed using [Composer](https://getcomposer.org/):
