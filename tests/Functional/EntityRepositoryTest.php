@@ -37,7 +37,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
 
         $configuration = new Configuration();
-        $paths         = array(__DIR__.'/../Fixtures/config');
+        $paths         = [__DIR__.'/../Fixtures/config'];
         $driver        = new YamlDriver($paths, '.rapl.yml');
         $configuration->setMetadataDriver($driver);
 
@@ -130,7 +130,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->mockHttpRequestAndResponse('books', 200, $json);
 
         /** @var Book $actual */
-        $actual = $this->repository->findOneBy(array());
+        $actual = $this->repository->findOneBy([]);
 
         $this->assertInstanceOf('RAPL\Tests\Fixtures\Entities\Book', $actual);
         $this->assertSame('Winnie the Pooh', $actual->getTitle());
@@ -145,7 +145,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private function mockHttpRequestAndResponse($uri, $responseCode = 200, $responseData = '')
     {
         $request  = new Request('GET', $uri);
-        $response = new Response($responseCode, array(), $responseData);
+        $response = new Response($responseCode, [], $responseData);
 
         $this->connection->shouldReceive('createRequest')->once()->with('GET', $uri)->andReturn($request);
 

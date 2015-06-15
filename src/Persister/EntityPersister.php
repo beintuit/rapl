@@ -34,5 +34,5 @@ interface EntityPersister
      *
      * @return array
      */
-    public function loadAll(array $conditions = array(), array $orderBy = array(), $limit = null, $offset = null);
+    public function loadAll(array $conditions = [], array $orderBy = [], $limit = null, $offset = null);
 }

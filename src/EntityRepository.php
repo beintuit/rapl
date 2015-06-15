@@ -41,7 +41,7 @@ class EntityRepository implements ObjectRepository
             $idFields = $this->classMetadata->getIdentifierFieldNames();
             $idField  = reset($idFields);
 
-            $id = array($idField => $id);
+            $id = [$idField => $id];
         }
 
         return $this->persister->loadById($id);
@@ -54,7 +54,7 @@ class EntityRepository implements ObjectRepository
      */
     public function findAll()
     {
-        return $this->findBy(array());
+        return $this->findBy([]);
     }
 
     /**
@@ -73,7 +73,7 @@ class EntityRepository implements ObjectRepository
      *
      * @throws \UnexpectedValueException
      */
-    public function findBy(array $criteria, array $orderBy = array(), $limit = null, $offset = null)
+    public function findBy(array $criteria, array $orderBy = [], $limit = null, $offset = null)
     {
         return $this->persister->loadAll($criteria, $orderBy, $limit, $offset);
     }

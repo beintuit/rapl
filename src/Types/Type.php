@@ -21,19 +21,19 @@ abstract class Type
     /**
      * @var array
      */
-    private static $typesMap = array(
+    private static $typesMap = [
         self::TYPE_ARRAY    => 'RAPL\RAPL\Types\ArrayType',
         self::TYPE_BOOLEAN  => 'RAPL\RAPL\Types\BooleanType',
         self::TYPE_DATETIME => 'RAPL\RAPL\Types\DateTimeType',
         self::TYPE_FLOAT    => 'RAPL\RAPL\Types\FloatType',
         self::TYPE_INTEGER  => 'RAPL\RAPL\Types\IntegerType',
         self::TYPE_STRING   => 'RAPL\RAPL\Types\StringType',
-    );
+    ];
 
     /**
      * @var Type[]
      */
-    private static $typeObjects = array();
+    private static $typeObjects = [];
 
     /**
      * Prevents instantiation and forces use of the factory method.

@@ -7,12 +7,12 @@ class Query
     /**
      * @var array
      */
-    protected $conditions = array();
+    protected $conditions = [];
 
     /**
      * @var array
      */
-    protected $orderBy = array();
+    protected $orderBy = [];
 
     /**
      * @var int|null
@@ -30,7 +30,7 @@ class Query
      * @param int|null $limit
      * @param int|null $offset
      */
-    public function __construct(array $conditions = array(), array $orderBy = array(), $limit = null, $offset = null)
+    public function __construct(array $conditions = [], array $orderBy = [], $limit = null, $offset = null)
     {
         $this->conditions = $conditions;
         $this->orderBy    = $orderBy;

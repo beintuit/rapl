@@ -45,7 +45,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      * @param string        $fieldName
      * @param array         $mapping
      */
-    private function addFieldMappingTo(MockInterface $classMetadataMock, $fieldName, array $mapping = array())
+    private function addFieldMappingTo(MockInterface $classMetadataMock, $fieldName, array $mapping = [])
     {
         if (!isset($mapping['serializedName'])) {
             $mapping['serializedName'] = $fieldName;
@@ -79,14 +79,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->addFieldMappingTo(
             $this->classMetadata,
             'stringData',
-            array(
+            [
                 'serializedName' => 'string',
                 'type'           => 'string',
-            )
+            ]
         );
 
-        $returnedEntity  = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
-        $returnedEntity2 = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Bar Baz'));
+        $returnedEntity  = $this->mockReturnEntity('Foo\Bar', ['stringData' => 'Foo Bar']);
+        $returnedEntity2 = $this->mockReturnEntity('Foo\Bar', ['stringData' => 'Bar Baz']);
 
         $json = '[
             {
@@ -109,10 +109,10 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->addFieldMappingTo(
             $this->classMetadata,
             'stringData',
-            array('serializedName' => 'string', 'type' => 'string')
+            ['serializedName' => 'string', 'type' => 'string']
         );
 
-        $returnedEntity = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
+        $returnedEntity = $this->mockReturnEntity('Foo\Bar', ['stringData' => 'Foo Bar']);
 
         $json = '{
             "string": "Foo Bar"
@@ -129,19 +129,19 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->addFieldMappingTo(
             $this->classMetadata,
             'stringData',
-            array(
+            [
                 'serializedName' => 'string',
                 'type'           => 'string',
-            )
+            ]
         );
 
-        $returnedEntity = $this->mockReturnEntity('Foo\Bar', array('stringData' => 'Foo Bar'));
+        $returnedEntity = $this->mockReturnEntity('Foo\Bar', ['stringData' => 'Foo Bar']);
 
         $json = '{"results": [{
             "string": "Foo Bar"
         }]}';
 
-        $entities = $this->serializer->deserialize($json, true, array('results'));
+        $entities = $this->serializer->deserialize($json, true, ['results']);
 
         $this->assertSame(1, count($entities));
         $this->assertSame($returnedEntity, $entities[0]);
@@ -155,7 +155,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             "foo": "bar"
         }]}';
 
-        $result = $this->serializer->deserialize($json, true, array('envelope'));
+        $result = $this->serializer->deserialize($json, true, ['envelope']);
 
         $this->assertEmpty($result);
     }
@@ -166,13 +166,13 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->addFieldMappingTo(
             $this->classMetadata,
             'embedded',
-            array(
+            [
                 'serializedName' => 'assoc',
                 'embedded'       => true,
                 'type'           => 'one',
                 'association'    => ClassMetadata::EMBED_ONE,
                 'targetEntity'   => 'Foo\BarBaz',
-            )
+            ]
         );
 
         $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
@@ -181,8 +181,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         $this->addFieldMappingTo($subClassMetadata, 'foo');
 
-        $subEntity  = $this->mockReturnEntity('Foo\BarBaz', array('foo' => 'bar'));
-        $mainEntity = $this->mockReturnEntity('Foo\Bar', array('string' => 'foo', 'embedded' => $subEntity));
+        $subEntity  = $this->mockReturnEntity('Foo\BarBaz', ['foo' => 'bar']);
+        $mainEntity = $this->mockReturnEntity('Foo\Bar', ['string' => 'foo', 'embedded' => $subEntity]);
 
         $this->classMetadataFactory->shouldReceive('getMetadataFor')->andReturn($subClassMetadata);
 
@@ -205,13 +205,13 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->addFieldMappingTo(
             $this->classMetadata,
             'embedded',
-            array(
+            [
                 'serializedName' => 'assoc',
                 'embedded'       => true,
                 'type'           => 'one',
                 'association'    => ClassMetadata::EMBED_ONE,
                 'targetEntity'   => 'Foo\BarBaz',
-            )
+            ]
         );
 
         $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
@@ -220,7 +220,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         $this->addFieldMappingTo($subClassMetadata, 'foo');
 
-        $mainEntity = $this->mockReturnEntity('Foo\Bar', array('string' => 'foo', 'embedded' => null));
+        $mainEntity = $this->mockReturnEntity('Foo\Bar', ['string' => 'foo', 'embedded' => null]);
 
         $this->classMetadataFactory->shouldReceive('getMetadataFor')->andReturn($subClassMetadata);
 

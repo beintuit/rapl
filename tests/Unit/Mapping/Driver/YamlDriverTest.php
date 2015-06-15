@@ -20,7 +20,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $paths               = array(__DIR__.'/../../../Fixtures/config/');
+        $paths               = [__DIR__.'/../../../Fixtures/config/'];
         $this->mappingDriver = new YamlDriver($paths);
 
         $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
@@ -43,45 +43,45 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('mapField')
             ->once()
             ->with(
-                array(
+                [
                     'fieldName'      => 'id',
                     'type'           => 'integer',
                     'serializedName' => null,
                     'id'             => true,
-                )
+                ]
             );
 
         $this->classMetadata
             ->shouldReceive('mapField')
             ->once()
             ->with(
-                array(
+                [
                     'fieldName'      => 'title',
                     'type'           => 'string',
                     'serializedName' => null,
-                )
+                ]
             );
 
         $this->classMetadata
             ->shouldReceive('mapField')
             ->once()
             ->with(
-                array(
+                [
                     'fieldName'      => 'isbn',
                     'type'           => null,
                     'serializedName' => null,
-                )
+                ]
             );
 
         $this->classMetadata
             ->shouldReceive('mapEmbedOne')
             ->once()
             ->with(
-                array(
+                [
                     'targetEntity'   => 'RAPL\Tests\Fixtures\Entities\Author',
                     'fieldName'      => 'author',
                     'serializedName' => null,
-                )
+                ]
             );
 
         $this->mappingDriver->loadMetadataForClass(self::CLASS_NAME, $this->classMetadata);

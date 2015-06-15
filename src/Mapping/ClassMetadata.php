@@ -33,7 +33,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @var array
      */
-    private $fieldMappings = array();
+    private $fieldMappings = [];
 
     /**
      * An array of field names, used to look up field names from serialized names.
@@ -41,7 +41,7 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @var array
      */
-    private $fieldNames = array();
+    private $fieldNames = [];
 
     /**
      * The association mappings of the class.
@@ -49,14 +49,14 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @var array
      */
-    private $associationMappings = array();
+    private $associationMappings = [];
 
     /**
      * The field names of all fields that are part of the identifier / primary key.
      *
      * @var array
      */
-    private $identifierFieldNames = array();
+    private $identifierFieldNames = [];
 
     /**
      * The ReflectionClass instance of the mapped class.
@@ -70,7 +70,7 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @var \ReflectionProperty[]
      */
-    private $reflFields = array();
+    private $reflFields = [];
 
     /**
      * The prototype from which new instances of the mapped class are created.
@@ -87,7 +87,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @var Route[][]
      */
-    private $routes = array();
+    private $routes = [];
 
     /**
      * @param string $className
@@ -382,7 +382,7 @@ class ClassMetadata implements ClassMetadataInterface
         $fieldName = $this->identifierFieldNames[0];
         $value     = $this->reflFields[$fieldName]->getValue($object);
 
-        return array($fieldName => $value);
+        return [$fieldName => $value];
     }
 
     /**

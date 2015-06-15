@@ -26,7 +26,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata->shouldReceive('hasRoute')->with('resource')->andReturn(true);
         $this->classMetadata->shouldReceive('hasRoute')->with('collection')->andReturn(true);
 
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(array('id'));
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(['id']);
 
         $this->classMetadata->shouldReceive('getRoute')->with('resource')->andReturn(new Route('books/{id}'));
         $this->classMetadata->shouldReceive('getRoute')->with('collection')->andReturn(new Route('books'));
@@ -42,14 +42,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateWithIdentifierAsConditionReturnsResourceUri()
     {
-        $this->assertSame('books/3', $this->router->generate($this->classMetadata, array('id' => 3)));
+        $this->assertSame('books/3', $this->router->generate($this->classMetadata, ['id' => 3]));
     }
 
     public function testGenerateWithNonIdentifierConditionsReturnsCollectionUriWithQueryString()
     {
         $this->assertSame(
             'books?serialized_title=Foo',
-            $this->router->generate($this->classMetadata, array('title' => 'Foo'))
+            $this->router->generate($this->classMetadata, ['title' => 'Foo'])
         );
     }
 
@@ -66,6 +66,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'A collection route is not configured for class Foo\Bar.'
         );
 
-        $this->router->generate($classMetadata, array());
+        $this->router->generate($classMetadata, []);
     }
 }

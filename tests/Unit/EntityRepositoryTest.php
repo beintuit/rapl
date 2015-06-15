@@ -35,27 +35,27 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Book();
 
-        $this->entityPersister->shouldReceive('loadById')->once()->with(array('id' => 3))->andReturn($object);
-        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->once()->andReturn(array('id'));
+        $this->entityPersister->shouldReceive('loadById')->once()->with(['id' => 3])->andReturn($object);
+        $this->classMetadata->shouldReceive('getIdentifierFieldNames')->once()->andReturn(['id']);
 
         $this->assertSame($object, $this->entityRepository->find(3));
     }
 
     public function testFindAll()
     {
-        $result = array(new Book());
+        $result = [new Book()];
 
-        $this->entityPersister->shouldReceive('loadAll')->once()->with(array(), null, null, null)->andReturn($result);
+        $this->entityPersister->shouldReceive('loadAll')->once()->with([], null, null, null)->andReturn($result);
 
         $this->assertSame($result, $this->entityRepository->findAll());
     }
 
     public function testFindBy()
     {
-        $result = array(new Book());
+        $result = [new Book()];
 
-        $criteria = array('id' => 3);
-        $orderBy  = array('name' => 'asc');
+        $criteria = ['id' => 3];
+        $orderBy  = ['name' => 'asc'];
         $limit    = 10;
         $offset   = 20;
 
@@ -72,9 +72,9 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Book();
 
-        $result = array($object);
+        $result = [$object];
 
-        $criteria = array('id' => 3);
+        $criteria = ['id' => 3];
 
         $this->entityPersister->shouldReceive('loadAll')->once()->with($criteria, null, null, null)->andReturn($result);
 

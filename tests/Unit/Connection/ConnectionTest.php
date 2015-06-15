@@ -37,7 +37,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testAddSubscriber()
     {
         $subscriber = \Mockery::mock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $subscriber->shouldReceive('getSubscribedEvents')->once()->andReturn(array());
+        $subscriber->shouldReceive('getSubscribedEvents')->once()->andReturn([]);
 
         $this->connection->addSubscriber($subscriber);
     }
