@@ -6,7 +6,6 @@ use Guzzle\Http\Client;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Connection implements ConnectionInterface
 {
@@ -42,13 +41,5 @@ class Connection implements ConnectionInterface
     public function sendRequest(RequestInterface $request)
     {
         return $request->send();
-    }
-
-    /**
-     * @param EventSubscriberInterface $subscriber
-     */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
-    {
-        $this->httpClient->addSubscriber($subscriber);
     }
 }
