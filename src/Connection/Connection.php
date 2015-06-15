@@ -15,11 +15,21 @@ class Connection implements ConnectionInterface
     private $guzzleClient;
 
     /**
-     * @param string $baseUrl
+     * @param ClientInterface $guzzleClient
      */
-    public function __construct($baseUrl)
+    public function __construct(ClientInterface $guzzleClient)
     {
-        $this->guzzleClient = new Client($baseUrl);
+        $this->guzzleClient = $guzzleClient;
+    }
+
+    /**
+     * @param string $baseUrl
+     *
+     * @return Connection
+     */
+    public static function create($baseUrl)
+    {
+        return new self(new Client($baseUrl));
     }
 
     /**
