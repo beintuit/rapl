@@ -37,17 +37,23 @@ This will add RAPL to the dependency list of your main project's composer.json.
 
 require_once 'vendor/autoload.php';
 
-$connection = new \RAPL\RAPL\Connection\Connection('http://example.com/api/');
+use RAPL\RAPL\Configuration;
+use RAPL\RAPL\Connection\Connection;
+use RAPL\RAPL\EntityManager;
+use RAPL\RAPL\Mapping\Driver\YamlDriver;
+use RAPL\RAPL\Routing\Router;
+
+$connection = new Connection('http://example.com/api/');
 $connection->addSubscriber(new \Your\Authentication\Subscriber());
 
-$configuration = new \RAPL\RAPL\Configuration();
+$configuration = new Configuration();
 $paths         = array(__DIR__ . '/config');
-$driver        = new \RAPL\RAPL\Mapping\Driver\YamlDriver($paths, '.rapl.yml');
+$driver        = new YamlDriver($paths, '.rapl.yml');
 $configuration->setMetadataDriver($driver);
 
-$router = new \RAPL\RAPL\Routing\Router();
+$router = new Router();
 
-$manager = new \RAPL\RAPL\EntityManager($connection, $configuration, $router);
+$manager = new EntityManager($connection, $configuration, $router);
 ```
 
 ## Usage
