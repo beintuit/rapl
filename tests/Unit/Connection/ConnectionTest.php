@@ -28,10 +28,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSendRequestInvokesSendMethodOnRequest()
     {
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
         $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-        $request->shouldReceive('send')->once();
 
-        $this->connection->sendRequest($request);
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
+        $response = \Mockery::mock('Guzzle\Http\Message\Response');
+
+        $request->shouldReceive('send')->once()->andReturn($response);
+
+        $actual = $this->connection->sendRequest($request);
+
+        $this->assertSame($response, $actual);
     }
 
     public function testAddSubscriber()
