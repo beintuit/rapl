@@ -28,6 +28,26 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->connection   = new Connection($this->guzzleClient);
     }
 
+    public function testRequestReturnsResponseObject()
+    {
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
+        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
+
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
+        $response = \Mockery::mock('Guzzle\Http\Message\Response');
+
+        $this->guzzleClient->shouldReceive('createRequest')
+            ->once()
+            ->with(self::REQUEST_METHOD, self::REQUEST_URI)
+            ->andReturn($request);
+
+        $request->shouldReceive('send')->once()->andReturn($response);
+
+        $actual = $this->connection->request(self::REQUEST_METHOD, self::REQUEST_URI);
+
+        $this->assertSame($response, $actual);
+    }
+
     public function testCreateRequestReturnsRequestObject()
     {
         /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */

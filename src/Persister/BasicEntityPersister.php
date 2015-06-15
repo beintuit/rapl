@@ -62,12 +62,11 @@ class BasicEntityPersister implements EntityPersister
      */
     public function load(array $conditions, $entity = null, $type = 'collection')
     {
-        $uri     = $this->getUri($conditions);
-        $route   = $this->getRoute($conditions);
-        $request = $this->connection->createRequest('GET', $uri);
+        $uri   = $this->getUri($conditions);
+        $route = $this->getRoute($conditions);
 
         try {
-            $response = $this->connection->sendRequest($request);
+            $response = $this->connection->request('GET', $uri);
         } catch (ClientErrorResponseException $e) {
             if ($e->getResponse()->getStatusCode() == 404) {
                 return null;
@@ -112,8 +111,7 @@ class BasicEntityPersister implements EntityPersister
     {
         $uri      = $this->getUri($conditions, $orderBy, $limit, $offset);
         $route    = $this->getRoute($conditions, $orderBy, $limit, $offset);
-        $request  = $this->connection->createRequest('GET', $uri);
-        $response = $this->connection->sendRequest($request);
+        $response = $this->connection->request('GET', $uri);
 
         return $this->serializer->deserialize(
             $response->getBody(true),

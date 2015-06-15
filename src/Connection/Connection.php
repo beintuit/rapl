@@ -36,7 +36,22 @@ class Connection implements ConnectionInterface
      * @param string $method
      * @param string $uri
      *
+     * @return Response
+     */
+    public function request($method, $uri)
+    {
+        $request = $this->guzzleClient->createRequest($method, $uri);
+
+        return $request->send();
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     *
      * @return RequestInterface
+     *
+     * @deprecated
      */
     public function createRequest($method, $uri)
     {
@@ -47,6 +62,8 @@ class Connection implements ConnectionInterface
      * @param RequestInterface $request
      *
      * @return Response
+     *
+     * @deprecated
      */
     public function sendRequest(RequestInterface $request)
     {
