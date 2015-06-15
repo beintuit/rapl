@@ -2,9 +2,9 @@
 
 namespace RAPL\RAPL\Connection;
 
-use Guzzle\Http\Client;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\RequestInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Message\RequestInterface;
 
 class Connection implements ConnectionInterface
 {
@@ -28,27 +28,27 @@ class Connection implements ConnectionInterface
      */
     public static function create($baseUrl)
     {
-        return new self(new Client($baseUrl));
+        return new self(new Client(['base_uri' => $baseUrl]));
     }
 
     /**
      * @param string $method
      * @param string $uri
      *
-     * @return \Guzzle\Http\Message\Response
+     * @return \GuzzleHttp\Message\ResponseInterface
      */
     public function request($method, $uri)
     {
         $request = $this->guzzleClient->createRequest($method, $uri);
 
-        return $request->send();
+        return $this->guzzleClient->send($request);
     }
 
     /**
      * @param string $method
      * @param string $uri
      *
-     * @return \Guzzle\Http\Message\RequestInterface
+     * @return \GuzzleHttp\Message\RequestInterface
      *
      * @deprecated
      */
@@ -60,12 +60,12 @@ class Connection implements ConnectionInterface
     /**
      * @param RequestInterface $request
      *
-     * @return \Guzzle\Http\Message\Response
+     * @return \GuzzleHttp\Message\ResponseInterface
      *
      * @deprecated
      */
     public function sendRequest(RequestInterface $request)
     {
-        return $request->send();
+        return $this->guzzleClient->send($request);
     }
 }
