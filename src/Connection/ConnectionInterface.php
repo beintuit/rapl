@@ -3,7 +3,6 @@
 namespace RAPL\RAPL\Connection;
 
 use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
 
 interface ConnectionInterface
 {
@@ -11,7 +10,7 @@ interface ConnectionInterface
      * @param string $method
      * @param string $uri
      *
-     * @return Response
+     * @return \Guzzle\Http\Message\Response
      */
     public function request($method, $uri);
 
@@ -19,7 +18,7 @@ interface ConnectionInterface
      * @param string $method
      * @param string $uri
      *
-     * @return RequestInterface
+     * @return \Guzzle\Http\Message\RequestInterface
      *
      * @deprecated
      */
@@ -28,7 +27,7 @@ interface ConnectionInterface
     /**
      * @param RequestInterface $request
      *
-     * @return Response
+     * @return \Guzzle\Http\Message\Response
      *
      * @deprecated
      */
