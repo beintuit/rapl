@@ -12,14 +12,14 @@ class Connection implements ConnectionInterface
     /**
      * @var ClientInterface
      */
-    protected $httpClient;
+    private $guzzleClient;
 
     /**
      * @param string $baseUrl
      */
     public function __construct($baseUrl)
     {
-        $this->httpClient = new Client($baseUrl);
+        $this->guzzleClient = new Client($baseUrl);
     }
 
     /**
@@ -30,7 +30,7 @@ class Connection implements ConnectionInterface
      */
     public function createRequest($method, $uri)
     {
-        return $this->httpClient->createRequest($method, $uri);
+        return $this->guzzleClient->createRequest($method, $uri);
     }
 
     /**
