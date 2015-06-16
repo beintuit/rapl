@@ -28,6 +28,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->connection   = new Connection($this->guzzleClient);
     }
 
+    public function testCreateReturnsConnectionInstance()
+    {
+        $actual = Connection::create(self::BASE_URL);
+
+        $this->assertInstanceOf('RAPL\RAPL\Connection\Connection', $actual);
+    }
+
     public function testRequestReturnsResponseObject()
     {
         /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
