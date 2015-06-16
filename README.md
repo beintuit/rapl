@@ -43,8 +43,7 @@ use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
 use RAPL\RAPL\Routing\Router;
 
-$connection = new Connection('http://example.com/api/');
-$connection->addSubscriber(new \Your\Authentication\Subscriber());
+$connection = Connection::create('http://example.com/api/');
 
 $configuration = new Configuration();
 $paths         = array(__DIR__ . '/config');

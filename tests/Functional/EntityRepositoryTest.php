@@ -147,13 +147,11 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
         $request  = new Request('GET', $uri);
         $response = new Response($responseCode, [], $responseData);
 
-        $this->connection->shouldReceive('createRequest')->once()->with('GET', $uri)->andReturn($request);
-
         if ($responseCode >= 400) {
             $exception = ClientErrorResponseException::factory($request, $response);
-            $this->connection->shouldReceive('sendRequest')->once()->with($request)->andThrow($exception);
+            $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andThrow($exception);
         } else {
-            $this->connection->shouldReceive('sendRequest')->once()->with($request)->andReturn($response);
+            $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andReturn($response);
         }
     }
 }

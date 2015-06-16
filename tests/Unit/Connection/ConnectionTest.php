@@ -8,6 +8,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
     const BASE_URL = 'http://example.com/api/';
 
+    const REQUEST_METHOD = 'GET';
+
+    const REQUEST_URI = 'foo/bar';
+
+    /**
+     * @var \Mockery\MockInterface|\Guzzle\Http\ClientInterface
+     */
+    private $guzzleClient;
+
     /**
      * @var Connection
      */
@@ -15,30 +24,64 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->connection = new Connection(self::BASE_URL);
+        $this->guzzleClient = \Mockery::mock('Guzzle\Http\ClientInterface');
+        $this->connection   = new Connection($this->guzzleClient);
+    }
+
+    public function testCreateReturnsConnectionInstance()
+    {
+        $actual = Connection::create(self::BASE_URL);
+
+        $this->assertInstanceOf('RAPL\RAPL\Connection\Connection', $actual);
+    }
+
+    public function testRequestReturnsResponseObject()
+    {
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
+        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
+
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
+        $response = \Mockery::mock('Guzzle\Http\Message\Response');
+
+        $this->guzzleClient->shouldReceive('createRequest')
+            ->once()
+            ->with(self::REQUEST_METHOD, self::REQUEST_URI)
+            ->andReturn($request);
+
+        $request->shouldReceive('send')->once()->andReturn($response);
+
+        $actual = $this->connection->request(self::REQUEST_METHOD, self::REQUEST_URI);
+
+        $this->assertSame($response, $actual);
     }
 
     public function testCreateRequestReturnsRequestObject()
     {
-        $request = $this->connection->createRequest('GET', 'foo/bar');
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
+        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
 
-        $this->assertInstanceOf('Guzzle\Http\Message\RequestInterface', $request);
-        $this->assertSame(self::BASE_URL.'foo/bar', $request->getUrl());
+        $this->guzzleClient->shouldReceive('createRequest')
+            ->once()
+            ->with(self::REQUEST_METHOD, self::REQUEST_URI)
+            ->andReturn($request);
+
+        $actual = $this->connection->createRequest('GET', 'foo/bar');
+
+        $this->assertSame($request, $actual);
     }
 
     public function testSendRequestInvokesSendMethodOnRequest()
     {
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
         $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
-        $request->shouldReceive('send')->once();
 
-        $this->connection->sendRequest($request);
-    }
+        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
+        $response = \Mockery::mock('Guzzle\Http\Message\Response');
 
-    public function testAddSubscriber()
-    {
-        $subscriber = \Mockery::mock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $subscriber->shouldReceive('getSubscribedEvents')->once()->andReturn([]);
+        $request->shouldReceive('send')->once()->andReturn($response);
 
-        $this->connection->addSubscriber($subscriber);
+        $actual = $this->connection->sendRequest($request);
+
+        $this->assertSame($response, $actual);
     }
 }

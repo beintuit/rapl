@@ -3,8 +3,6 @@
 namespace RAPL\RAPL\Connection;
 
 use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 interface ConnectionInterface
 {
@@ -12,21 +10,26 @@ interface ConnectionInterface
      * @param string $method
      * @param string $uri
      *
-     * @return RequestInterface
+     * @return \Guzzle\Http\Message\Response
+     */
+    public function request($method, $uri);
+
+    /**
+     * @param string $method
+     * @param string $uri
+     *
+     * @return \Guzzle\Http\Message\RequestInterface
+     *
+     * @deprecated
      */
     public function createRequest($method, $uri);
 
     /**
      * @param RequestInterface $request
      *
-     * @return Response
+     * @return \Guzzle\Http\Message\Response
+     *
+     * @deprecated
      */
     public function sendRequest(RequestInterface $request);
-
-    /**
-     * @param EventSubscriberInterface $subscriber
-     *
-     * @return void
-     */
-    public function addSubscriber(EventSubscriberInterface $subscriber);
 }
