@@ -2,7 +2,7 @@
 
 namespace RAPL\RAPL\Persister;
 
-use Guzzle\Http\Exception\ClientErrorResponseException;
+use GuzzleHttp\Exception\ClientException;
 use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManagerInterface;
 use RAPL\RAPL\Mapping\ClassMetadata;
@@ -67,7 +67,7 @@ class BasicEntityPersister implements EntityPersister
 
         try {
             $response = $this->connection->request('GET', $uri);
-        } catch (ClientErrorResponseException $e) {
+        } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 404) {
                 return null;
             } else {
@@ -76,7 +76,7 @@ class BasicEntityPersister implements EntityPersister
         }
 
         $entities = $this->serializer->deserialize(
-            $response->getBody(true),
+            $response->getBody(),
             $route->returnsCollection(),
             $route->getEnvelopes()
         );
@@ -114,7 +114,7 @@ class BasicEntityPersister implements EntityPersister
         $response = $this->connection->request('GET', $uri);
 
         return $this->serializer->deserialize(
-            $response->getBody(true),
+            $response->getBody(),
             $route->returnsCollection(),
             $route->getEnvelopes()
         );

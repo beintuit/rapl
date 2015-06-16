@@ -2,9 +2,10 @@
 
 namespace RAPL\Tests\Functional;
 
-use Guzzle\Http\Exception\ClientErrorResponseException;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Message\Request;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Stream\Stream;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
@@ -74,7 +75,7 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->mockHttpRequestAndResponse('books/1', 403);
 
-        $this->setExpectedException('Guzzle\Http\Exception\ClientErrorResponseException');
+        $this->setExpectedException('GuzzleHttp\Exception\ClientException');
 
         $this->repository->find(1);
     }
@@ -144,11 +145,13 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private function mockHttpRequestAndResponse($uri, $responseCode = 200, $responseData = '')
     {
-        $request  = new Request('GET', $uri);
-        $response = new Response($responseCode, [], $responseData);
+        $request = new Request('GET', $uri);
+
+        $stream   = Stream::factory($responseData);
+        $response = new Response($responseCode, [], $stream);
 
         if ($responseCode >= 400) {
-            $exception = ClientErrorResponseException::factory($request, $response);
+            $exception = RequestException::create($request, $response);
             $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andThrow($exception);
         } else {
             $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andReturn($response);

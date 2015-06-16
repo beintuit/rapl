@@ -9,7 +9,7 @@
     "require": {
         "php": ">=5.4.0",
         "doctrine/common": "~2.4",
-        "guzzle/guzzle": "~3.9",
+        "guzzlehttp/guzzle": "~5.0",
         "symfony/serializer": "~2.5",
         "symfony/yaml": "~2.5"
     },

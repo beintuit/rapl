@@ -13,7 +13,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     const REQUEST_URI = 'foo/bar';
 
     /**
-     * @var \Mockery\MockInterface|\Guzzle\Http\ClientInterface
+     * @var \Mockery\MockInterface|\GuzzleHttp\ClientInterface
      */
     private $guzzleClient;
 
@@ -24,7 +24,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->guzzleClient = \Mockery::mock('Guzzle\Http\ClientInterface');
+        $this->guzzleClient = \Mockery::mock('GuzzleHttp\ClientInterface');
         $this->connection   = new Connection($this->guzzleClient);
     }
 
@@ -37,18 +37,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testRequestReturnsResponseObject()
     {
-        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
+        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
+        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
 
-        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
-        $response = \Mockery::mock('Guzzle\Http\Message\Response');
+        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\Response $response */
+        $response = \Mockery::mock('GuzzleHttp\Message\Response');
 
         $this->guzzleClient->shouldReceive('createRequest')
             ->once()
             ->with(self::REQUEST_METHOD, self::REQUEST_URI)
             ->andReturn($request);
 
-        $request->shouldReceive('send')->once()->andReturn($response);
+        $this->guzzleClient->shouldReceive('send')->once()->with($request)->andReturn($response);
 
         $actual = $this->connection->request(self::REQUEST_METHOD, self::REQUEST_URI);
 
@@ -57,8 +57,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateRequestReturnsRequestObject()
     {
-        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
+        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
+        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
 
         $this->guzzleClient->shouldReceive('createRequest')
             ->once()
@@ -72,13 +72,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSendRequestInvokesSendMethodOnRequest()
     {
-        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\RequestInterface $request */
-        $request = \Mockery::mock('Guzzle\Http\Message\RequestInterface');
+        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
+        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
 
-        /** @var \Mockery\MockInterface|\Guzzle\Http\Message\Response $response */
-        $response = \Mockery::mock('Guzzle\Http\Message\Response');
+        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\Response $response */
+        $response = \Mockery::mock('GuzzleHttp\Message\Response');
 
-        $request->shouldReceive('send')->once()->andReturn($response);
+        $this->guzzleClient->shouldReceive('send')->once()->with($request)->andReturn($response);
 
         $actual = $this->connection->sendRequest($request);
 
