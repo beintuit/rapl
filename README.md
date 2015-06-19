@@ -22,7 +22,7 @@ RAPL requires PHP 5.4 or higher.
 
 ## Installation
 
-RAPL can be installed using [Composer](https://getcomposer.org/):
+RAPL is on [Packagist](https://packagist.org/packages/rapl/rapl) and can be installed using [Composer](https://getcomposer.org/):
 
 ```bash
 composer require rapl/rapl
