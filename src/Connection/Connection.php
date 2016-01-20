@@ -4,7 +4,8 @@ namespace RAPL\RAPL\Connection;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\HandlerStack;
 
 class Connection implements ConnectionInterface
 {
@@ -22,50 +23,37 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * @param string $baseUrl
+     * @param string     $baseUrl
+     * @param callable[] $middleware
      *
      * @return Connection
      */
-    public static function create($baseUrl)
+    public static function create($baseUrl, array $middleware = [])
     {
-        return new self(new Client(['base_uri' => $baseUrl]));
+        $stack = new HandlerStack(new CurlHandler());
+
+        foreach ($middleware as $element) {
+            $stack->push($element);
+        }
+
+        $client = new Client(
+            [
+                'base_uri' => $baseUrl,
+                'handler'  => $stack,
+            ]
+        );
+
+        return new self($client);
     }
 
     /**
      * @param string $method
      * @param string $uri
      *
-     * @return \GuzzleHttp\Message\ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function request($method, $uri)
     {
-        $request = $this->guzzleClient->createRequest($method, $uri);
-
-        return $this->guzzleClient->send($request);
-    }
-
-    /**
-     * @param string $method
-     * @param string $uri
-     *
-     * @return \GuzzleHttp\Message\RequestInterface
-     *
-     * @deprecated
-     */
-    public function createRequest($method, $uri)
-    {
-        return $this->guzzleClient->createRequest($method, $uri);
-    }
-
-    /**
-     * @param RequestInterface $request
-     *
-     * @return \GuzzleHttp\Message\ResponseInterface
-     *
-     * @deprecated
-     */
-    public function sendRequest(RequestInterface $request)
-    {
-        return $this->guzzleClient->send($request);
+        return $this->guzzleClient->request($method, $uri);
     }
 }

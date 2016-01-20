@@ -2,6 +2,8 @@
 
 namespace RAPL\Tests\Unit\Connection;
 
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 use RAPL\RAPL\Connection\Connection;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
@@ -18,7 +20,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     private $guzzleClient;
 
     /**
-     * @var Connection
+     * @var \RAPL\RAPL\Connection\Connection
      */
     private $connection;
 
@@ -30,57 +32,29 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateReturnsConnectionInstance()
     {
-        $actual = Connection::create(self::BASE_URL);
+        $middleware = [
+            Middleware::mapRequest(function (RequestInterface $request) {
+                return $request->withHeader('X-Foo', 'bar');
+            })
+        ];
+
+        $actual = Connection::create(self::BASE_URL, $middleware);
 
         $this->assertInstanceOf('RAPL\RAPL\Connection\Connection', $actual);
     }
 
-    public function testRequestReturnsResponseObject()
+    public function testRequestCallsRequestOnGuzzleClient()
     {
-        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
-        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
+        /** @var \Mockery\MockInterface|\Psr\Http\Message\ResponseInterface $response */
+        $response = \Mockery::mock('Psr\Http\Message\ResponseInterface');
 
-        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\Response $response */
-        $response = \Mockery::mock('GuzzleHttp\Message\Response');
-
-        $this->guzzleClient->shouldReceive('createRequest')
+        $this->guzzleClient
+            ->shouldReceive('request')
             ->once()
             ->with(self::REQUEST_METHOD, self::REQUEST_URI)
-            ->andReturn($request);
-
-        $this->guzzleClient->shouldReceive('send')->once()->with($request)->andReturn($response);
+            ->andReturn($response);
 
         $actual = $this->connection->request(self::REQUEST_METHOD, self::REQUEST_URI);
-
-        $this->assertSame($response, $actual);
-    }
-
-    public function testCreateRequestReturnsRequestObject()
-    {
-        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
-        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
-
-        $this->guzzleClient->shouldReceive('createRequest')
-            ->once()
-            ->with(self::REQUEST_METHOD, self::REQUEST_URI)
-            ->andReturn($request);
-
-        $actual = $this->connection->createRequest('GET', 'foo/bar');
-
-        $this->assertSame($request, $actual);
-    }
-
-    public function testSendRequestInvokesSendMethodOnRequest()
-    {
-        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\RequestInterface $request */
-        $request = \Mockery::mock('GuzzleHttp\Message\RequestInterface');
-
-        /** @var \Mockery\MockInterface|\GuzzleHttp\Message\Response $response */
-        $response = \Mockery::mock('GuzzleHttp\Message\Response');
-
-        $this->guzzleClient->shouldReceive('send')->once()->with($request)->andReturn($response);
-
-        $actual = $this->connection->sendRequest($request);
 
         $this->assertSame($response, $actual);
     }

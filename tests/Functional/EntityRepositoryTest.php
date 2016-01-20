@@ -3,9 +3,8 @@
 namespace RAPL\Tests\Functional;
 
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Message\Request;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
@@ -145,10 +144,8 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private function mockHttpRequestAndResponse($uri, $responseCode = 200, $responseData = '')
     {
-        $request = new Request('GET', $uri);
-
-        $stream   = Stream::factory($responseData);
-        $response = new Response($responseCode, [], $stream);
+        $request  = new Request('GET', $uri);
+        $response = new Response($responseCode, [], $responseData);
 
         if ($responseCode >= 400) {
             $exception = RequestException::create($request, $response);
