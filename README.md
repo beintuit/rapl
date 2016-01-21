@@ -18,7 +18,7 @@ It implements the same interfaces, but allows you to store and retrieve entities
 
 ## Requirements
 
-RAPL requires PHP 5.4 or higher.
+RAPL requires PHP 5.5 or higher.
 
 ## Installation
 
@@ -37,13 +37,18 @@ This will add RAPL to the dependency list of your main project's composer.json.
 
 require_once 'vendor/autoload.php';
 
+use GuzzleHttp\Middleware;
+use Psr7\Http\Message\RequestInterface;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\Connection\Connection;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
 use RAPL\RAPL\Routing\Router;
 
-$connection = Connection::create('http://example.com/api/');
+$middleware = Middleware::mapRequest(function (RequestInterface $request) {
+   return $request->withHeader('X-Foo', 'bar');
+});
+$connection = Connection::create('http://example.com/api/', [$middleware]);
 
 $configuration = new Configuration();
 $paths         = array(__DIR__ . '/config');
