@@ -2,10 +2,12 @@
 
 namespace RAPL\Tests\Unit\Repository;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\EntityManagerInterface;
 use RAPL\RAPL\Repository\DefaultRepositoryFactory;
 
-class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
+class DefaultRepositoryFactoryTest extends PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'SomeClass';
 
@@ -15,12 +17,12 @@ class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     private $factory;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var Mockery\MockInterface
      */
     private $unitOfWork;
 
     /**
-     * @var \Mockery\MockInterface|EntityManagerInterface
+     * @var Mockery\MockInterface|EntityManagerInterface
      */
     private $entityManager;
 
@@ -28,15 +30,15 @@ class DefaultRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory = new DefaultRepositoryFactory();
 
-        $classMetadata = \Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = Mockery::mock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata->shouldReceive('getName')->andReturn(self::CLASS_NAME);
 
-        $persister = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
+        $persister = Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
 
-        $this->unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
+        $this->unitOfWork = Mockery::mock('RAPL\RAPL\UnitOfWork');
         $this->unitOfWork->shouldReceive('getEntityPersister')->with(self::CLASS_NAME)->andReturn($persister);
 
-        $this->entityManager = \Mockery::mock('RAPL\RAPL\EntityManagerInterface');
+        $this->entityManager = Mockery::mock('RAPL\RAPL\EntityManagerInterface');
         $this->entityManager->shouldReceive('getUnitOfWork')->andReturn($this->unitOfWork);
         $this->entityManager->shouldReceive('getClassMetadata')->andReturn($classMetadata);
     }

@@ -2,26 +2,28 @@
 
 namespace RAPL\Tests\Unit\Mapping;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\ClassMetadataFactory;
 
-class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ClassMetadataFactoryTest extends PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
 
     CONST CLASS_ALIAS = 'Foo:Book';
 
     /**
-     * @var \Mockery\MockInterface
+     * @var Mockery\MockInterface
      */
     private $mappingDriver;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var Mockery\MockInterface
      */
     private $configuration;
 
     /**
-     * @var \Mockery\MockInterface|\RAPL\RAPL\EntityManager
+     * @var Mockery\MockInterface|\RAPL\RAPL\EntityManager
      */
     private $entityManager;
 
@@ -32,12 +34,12 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mappingDriver = \Mockery::mock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
+        $this->mappingDriver = Mockery::mock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
 
-        $this->configuration = \Mockery::mock('RAPL\RAPL\Configuration');
+        $this->configuration = Mockery::mock('RAPL\RAPL\Configuration');
         $this->configuration->shouldReceive('getMetadataDriver')->andReturn($this->mappingDriver);
 
-        $this->entityManager = \Mockery::mock('RAPL\RAPL\EntityManager');
+        $this->entityManager = Mockery::mock('RAPL\RAPL\EntityManager');
         $this->entityManager->shouldReceive('getConfiguration')->andReturn($this->configuration);
 
         $this->classMetadataFactory = new ClassMetadataFactory();

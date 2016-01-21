@@ -2,24 +2,26 @@
 
 namespace RAPL\Tests\Unit\Serializer;
 
+use Mockery;
 use Mockery\MockInterface;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Serializer\Serializer;
 
-class SerializerTest extends \PHPUnit_Framework_TestCase
+class SerializerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Mockery\MockInterface|ClassMetadata
+     * @var MockInterface|ClassMetadata
      */
     private $classMetadata;
 
     /**
-     * @var \Mockery\MockInterface|\RAPL\RAPL\UnitOfWork
+     * @var MockInterface|\RAPL\RAPL\UnitOfWork
      */
     private $unitOfWork;
 
     /**
-     * @var \Mockery\MockInterface|\RAPL\RAPL\Mapping\ClassMetadataFactory
+     * @var MockInterface|\RAPL\RAPL\Mapping\ClassMetadataFactory
      */
     private $classMetadataFactory;
 
@@ -30,12 +32,12 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $this->classMetadata->shouldReceive('getName')->andReturn('Foo\Bar');
         $this->classMetadata->shouldReceive('getFormat')->andReturn('json');
 
-        $this->unitOfWork           = \Mockery::mock('RAPL\RAPL\UnitOfWork');
-        $this->classMetadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $this->unitOfWork           = Mockery::mock('RAPL\RAPL\UnitOfWork');
+        $this->classMetadataFactory = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
 
         $this->serializer = new Serializer($this->classMetadata, $this->unitOfWork, $this->classMetadataFactory);
     }
@@ -67,7 +69,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     private function mockReturnEntity($className, array $data)
     {
-        $entity = \Mockery::mock($className);
+        $entity = Mockery::mock($className);
 
         $this->unitOfWork->shouldReceive('createEntity')->with($className, $data)->once()->andReturn($entity);
 
@@ -175,7 +177,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $subClassMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $subClassMetadata->shouldReceive('getName')->andReturn('Foo\BarBaz');
         $subClassMetadata->shouldReceive('getFormat')->andReturn('json');
 
@@ -214,7 +216,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $subClassMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $subClassMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $subClassMetadata->shouldReceive('getName')->andReturn('Foo\BarBaz');
         $subClassMetadata->shouldReceive('getFormat')->andReturn('json');
 

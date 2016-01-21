@@ -3,10 +3,12 @@
 namespace RAPL\Tests\Unit\Connection;
 
 use GuzzleHttp\Middleware;
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
 use RAPL\RAPL\Connection\Connection;
 
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends PHPUnit_Framework_TestCase
 {
     const BASE_URL = 'http://example.com/api/';
 
@@ -15,18 +17,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     const REQUEST_URI = 'foo/bar';
 
     /**
-     * @var \Mockery\MockInterface|\GuzzleHttp\ClientInterface
+     * @var Mockery\MockInterface|\GuzzleHttp\ClientInterface
      */
     private $guzzleClient;
 
     /**
-     * @var \RAPL\RAPL\Connection\Connection
+     * @var Connection
      */
     private $connection;
 
     protected function setUp()
     {
-        $this->guzzleClient = \Mockery::mock('GuzzleHttp\ClientInterface');
+        $this->guzzleClient = Mockery::mock('GuzzleHttp\ClientInterface');
         $this->connection   = new Connection($this->guzzleClient);
     }
 
@@ -45,8 +47,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testRequestCallsRequestOnGuzzleClient()
     {
-        /** @var \Mockery\MockInterface|\Psr\Http\Message\ResponseInterface $response */
-        $response = \Mockery::mock('Psr\Http\Message\ResponseInterface');
+        /** @var Mockery\MockInterface|\Psr\Http\Message\ResponseInterface $response */
+        $response = Mockery::mock('Psr\Http\Message\ResponseInterface');
 
         $this->guzzleClient
             ->shouldReceive('request')

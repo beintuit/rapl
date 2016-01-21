@@ -2,9 +2,10 @@
 
 namespace RAPL\Tests\Unit\Types;
 
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Types\Type;
 
-abstract class AbstractTypeTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractTypeTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Type
