@@ -2,9 +2,11 @@
 
 namespace RAPL\Tests\Unit;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Configuration;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Configuration
@@ -29,7 +31,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testSetGetMappingDriver()
     {
-        $mappingDriverMock = \Mockery::mock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
+        $mappingDriverMock = Mockery::mock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
 
         $this->configuration->setMetadataDriver($mappingDriverMock);
 

@@ -2,6 +2,8 @@
 
 namespace RAPL\Tests\Unit;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityRepository;
@@ -9,25 +11,25 @@ use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\UnitOfWork;
 use RAPL\Tests\Mocks\EntityManagerMock;
 
-class EntityManagerTest extends \PHPUnit_Framework_TestCase
+class EntityManagerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Mockery\MockInterface|EntityRepository
+     * @var Mockery\MockInterface|EntityRepository
      */
     private $repository;
 
     /**
-     * @var \Mockery\MockInterface|ConnectionInterface
+     * @var Mockery\MockInterface|ConnectionInterface
      */
     private $connection;
 
     /**
-     * @var \Mockery\MockInterface|Configuration
+     * @var Mockery\MockInterface|Configuration
      */
     private $configuration;
 
     /**
-     * @var \Mockery\MockInterface|UnitOfWork
+     * @var Mockery\MockInterface|UnitOfWork
      */
     private $unitOfWork;
 
@@ -38,21 +40,21 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->repository = \Mockery::mock('RAPL\RAPL\EntityRepository');
+        $this->repository = Mockery::mock('RAPL\RAPL\EntityRepository');
 
-        $repositoryFactory = \Mockery::mock('RAPL\RAPL\Repository\RepositoryFactory');
+        $repositoryFactory = Mockery::mock('RAPL\RAPL\Repository\RepositoryFactory');
         $repositoryFactory->shouldReceive('getRepository')->andReturn($this->repository);
 
-        $this->connection = \Mockery::mock('RAPL\RAPL\Connection\Connection');
+        $this->connection = Mockery::mock('RAPL\RAPL\Connection\Connection');
 
-        $this->configuration = \Mockery::mock('RAPL\RAPL\Configuration');
+        $this->configuration = Mockery::mock('RAPL\RAPL\Configuration');
         $this->configuration->shouldReceive('getRepositoryFactory')->andReturn($repositoryFactory);
 
-        $router = \Mockery::mock('RAPL\RAPL\Routing\Router');
+        $router = Mockery::mock('RAPL\RAPL\Routing\Router');
 
         $this->entityManager = new EntityManagerMock($this->connection, $this->configuration, $router);
 
-        $this->unitOfWork = \Mockery::mock('RAPL\RAPL\UnitOfWork');
+        $this->unitOfWork = Mockery::mock('RAPL\RAPL\UnitOfWork');
         $this->entityManager->setUnitOfWork($this->unitOfWork);
     }
 
@@ -151,7 +153,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $classMetadata = new ClassMetadata($className);
 
-        $classMetadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $classMetadataFactory = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
         $classMetadataFactory->shouldReceive('getMetadataFor')->once()->with($className)->andReturn($classMetadata);
 
         $this->entityManager->setMetadataFactory($classMetadataFactory);

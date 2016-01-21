@@ -5,6 +5,8 @@ namespace RAPL\Tests\Functional;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Configuration;
 use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
@@ -13,7 +15,7 @@ use RAPL\RAPL\Mapping\Driver\YamlDriver;
 use RAPL\RAPL\Routing\Router;
 use RAPL\Tests\Fixtures\Entities\Book;
 
-class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
+class EntityRepositoryTest extends PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
 
@@ -28,13 +30,13 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var \Mockery\MockInterface|ConnectionInterface
+     * @var Mockery\MockInterface|ConnectionInterface
      */
     private $connection;
 
     protected function setUp()
     {
-        $this->connection = \Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
+        $this->connection = Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
 
         $configuration = new Configuration();
         $paths         = [__DIR__.'/../Fixtures/config'];

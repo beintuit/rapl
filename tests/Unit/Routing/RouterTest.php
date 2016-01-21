@@ -2,11 +2,13 @@
 
 namespace RAPL\Tests\Unit\Routing;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Mapping\Route;
 use RAPL\RAPL\Routing\Router;
 
-class RouterTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Router
@@ -14,14 +16,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     private $router;
 
     /**
-     * @var \Mockery\MockInterface|ClassMetadata
+     * @var Mockery\MockInterface|ClassMetadata
      */
     private $classMetadata;
 
     protected function setUp()
     {
         $this->router        = new Router();
-        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
 
         $this->classMetadata->shouldReceive('hasRoute')->with('resource')->andReturn(true);
         $this->classMetadata->shouldReceive('hasRoute')->with('collection')->andReturn(true);
@@ -55,7 +57,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateWithMissingRouteConfigurationThrowsException()
     {
-        $classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $classMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
 
         $classMetadata->shouldReceive('hasRoute')->once()->with('resource')->andReturn(false);
         $classMetadata->shouldReceive('hasRoute')->once()->with('collection')->andReturn(false);

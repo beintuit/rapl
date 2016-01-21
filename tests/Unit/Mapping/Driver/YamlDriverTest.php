@@ -2,9 +2,11 @@
 
 namespace RAPL\Tests\Unit\Mapping\Driver;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
 
-class YamlDriverTest extends \PHPUnit_Framework_TestCase
+class YamlDriverTest extends PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
 
@@ -23,7 +25,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
         $paths               = [__DIR__.'/../../../Fixtures/config/'];
         $this->mappingDriver = new YamlDriver($paths);
 
-        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->classMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $this->classMetadata->shouldReceive('setFormat')->with('json')->once();
     }
 
@@ -32,12 +34,12 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata
             ->shouldReceive('setRoute')
             ->once()
-            ->with('resource', \Mockery::type('RAPL\RAPL\Mapping\Route'));
+            ->with('resource', Mockery::type('RAPL\RAPL\Mapping\Route'));
 
         $this->classMetadata
             ->shouldReceive('setRoute')
             ->once()
-            ->with('collection', \Mockery::type('RAPL\RAPL\Mapping\Route'));
+            ->with('collection', Mockery::type('RAPL\RAPL\Mapping\Route'));
 
         $this->classMetadata
             ->shouldReceive('mapField')

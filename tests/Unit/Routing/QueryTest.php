@@ -2,9 +2,10 @@
 
 namespace RAPL\Tests\Unit\Routing;
 
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Routing\Query;
 
-class QueryTest extends \PHPUnit_Framework_TestCase
+class QueryTest extends PHPUnit_Framework_TestCase
 {
     public function testQuery()
     {

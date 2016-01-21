@@ -2,19 +2,21 @@
 
 namespace RAPL\Tests\Unit;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\UnitOfWork;
 use RAPL\Tests\Fixtures\Entities\Book;
 
-class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
+class UnitOfWorkTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Mockery\MockInterface|EntityManager
+     * @var Mockery\MockInterface|EntityManager
      */
     protected $entityManager;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var Mockery\MockInterface
      */
     private $classMetadata;
 
@@ -27,8 +29,8 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $router              = \Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
-        $this->classMetadata = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $router              = Mockery::mock('RAPL\RAPL\Routing\RouterInterface');
+        $this->classMetadata = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $this->classMetadata->shouldReceive('getIdentifierFieldNames')->andReturn(['id']);
         $this->classMetadata->shouldReceive('newInstance')->andReturn(new Book());
         $this->classMetadata->shouldReceive('hasField')->with('id')->andReturn(true);
@@ -36,9 +38,9 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata->shouldReceive('setFieldValue');
         $this->classMetadata->shouldReceive('getName')->andReturn(self::CLASS_NAME);
 
-        $connection = \Mockery::mock('RAPL\RAPL\Connection\Connection');
+        $connection = Mockery::mock('RAPL\RAPL\Connection\Connection');
 
-        $this->entityManager = \Mockery::mock('RAPL\RAPL\EntityManager');
+        $this->entityManager = Mockery::mock('RAPL\RAPL\EntityManager');
         $this->entityManager->shouldReceive('getConnection')->andReturn($connection);
         $this->entityManager
             ->shouldReceive('getClassMetadata')
@@ -52,7 +54,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityPersister()
     {
-        $metadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $metadataFactory = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
         $this->entityManager->shouldReceive('getMetadataFactory')->once()->andReturn($metadataFactory);
 
         $this->assertInstanceOf(
@@ -63,7 +65,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
 
     public function testCallingGetEntityPersisterTwiceReturnsTheSameInstance()
     {
-        $metadataFactory = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
+        $metadataFactory = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadataFactory');
         $this->entityManager->shouldReceive('getMetadataFactory')->once()->andReturn($metadataFactory);
 
         $this->assertSame(

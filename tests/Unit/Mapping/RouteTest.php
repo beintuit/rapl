@@ -2,9 +2,10 @@
 
 namespace RAPL\Tests\Unit\Mapping;
 
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\Route;
 
-class RouteTest extends \PHPUnit_Framework_TestCase
+class RouteTest extends PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {

@@ -2,12 +2,14 @@
 
 namespace RAPL\Tests\Unit;
 
+use Mockery;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Persister\EntityPersister;
 use RAPL\Tests\Fixtures\Entities\Book;
 
-class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
+class EntityRepositoryTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var EntityRepository
@@ -15,19 +17,19 @@ class EntityRepositoryTest extends \PHPUnit_Framework_TestCase
     private $entityRepository;
 
     /**
-     * @var \Mockery\MockInterface|EntityPersister
+     * @var Mockery\MockInterface|EntityPersister
      */
     private $entityPersister;
 
     /**
-     * @var \Mockery\MockInterface|ClassMetadata
+     * @var Mockery\MockInterface|ClassMetadata
      */
     private $classMetadata;
 
     protected function setUp()
     {
-        $this->entityPersister  = \Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
-        $this->classMetadata    = \Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
+        $this->entityPersister  = Mockery::mock('RAPL\RAPL\Persister\EntityPersister');
+        $this->classMetadata    = Mockery::mock('RAPL\RAPL\Mapping\ClassMetadata');
         $this->entityRepository = new EntityRepository($this->entityPersister, $this->classMetadata);
     }
 

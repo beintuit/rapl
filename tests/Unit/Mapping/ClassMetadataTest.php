@@ -3,11 +3,12 @@
 namespace RAPL\Tests\Unit\Mapping;
 
 use Doctrine\Common\Persistence\Mapping\RuntimeReflectionService;
+use PHPUnit_Framework_TestCase;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Mapping\Route;
 use RAPL\Tests\Fixtures\Entities\Book;
 
-class ClassMetadataTest extends \PHPUnit_Framework_TestCase
+class ClassMetadataTest extends PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'RAPL\Tests\Fixtures\Entities\Book';
 
