@@ -4,6 +4,7 @@ namespace RAPL\Tests\Unit;
 
 use Mockery;
 use PHPUnit_Framework_TestCase;
+use RAPL\RAPL\Client\HttpClient;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\UnitOfWork;
 use RAPL\Tests\Fixtures\Entities\Book;
@@ -38,10 +39,10 @@ class UnitOfWorkTest extends PHPUnit_Framework_TestCase
         $this->classMetadata->shouldReceive('setFieldValue');
         $this->classMetadata->shouldReceive('getName')->andReturn(self::CLASS_NAME);
 
-        $connection = Mockery::mock('RAPL\RAPL\Connection\Connection');
+        $httpClient = Mockery::mock(HttpClient::class);
 
         $this->entityManager = Mockery::mock('RAPL\RAPL\EntityManager');
-        $this->entityManager->shouldReceive('getConnection')->andReturn($connection);
+        $this->entityManager->shouldReceive('getHttpClient')->andReturn($httpClient);
         $this->entityManager
             ->shouldReceive('getClassMetadata')
             ->with(self::CLASS_NAME)

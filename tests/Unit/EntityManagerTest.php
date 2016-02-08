@@ -4,8 +4,8 @@ namespace RAPL\Tests\Unit;
 
 use Mockery;
 use PHPUnit_Framework_TestCase;
+use RAPL\RAPL\Client\HttpClient;
 use RAPL\RAPL\Configuration;
-use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\UnitOfWork;
@@ -19,9 +19,9 @@ class EntityManagerTest extends PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var Mockery\MockInterface|ConnectionInterface
+     * @var Mockery\MockInterface|HttpClient
      */
-    private $connection;
+    private $httpClient;
 
     /**
      * @var Mockery\MockInterface|Configuration
@@ -45,14 +45,14 @@ class EntityManagerTest extends PHPUnit_Framework_TestCase
         $repositoryFactory = Mockery::mock('RAPL\RAPL\Repository\RepositoryFactory');
         $repositoryFactory->shouldReceive('getRepository')->andReturn($this->repository);
 
-        $this->connection = Mockery::mock('RAPL\RAPL\Connection\Connection');
+        $this->httpClient = Mockery::mock(HttpClient::class);
 
         $this->configuration = Mockery::mock('RAPL\RAPL\Configuration');
         $this->configuration->shouldReceive('getRepositoryFactory')->andReturn($repositoryFactory);
 
         $router = Mockery::mock('RAPL\RAPL\Routing\Router');
 
-        $this->entityManager = new EntityManagerMock($this->connection, $this->configuration, $router);
+        $this->entityManager = new EntityManagerMock($this->httpClient, $this->configuration, $router);
 
         $this->unitOfWork = Mockery::mock('RAPL\RAPL\UnitOfWork');
         $this->entityManager->setUnitOfWork($this->unitOfWork);
@@ -183,7 +183,7 @@ class EntityManagerTest extends PHPUnit_Framework_TestCase
 
     public function testGetConnection()
     {
-        $this->assertSame($this->connection, $this->entityManager->getConnection());
+        $this->assertSame($this->httpClient, $this->entityManager->getHttpClient());
     }
 
     public function testGetConfiguration()

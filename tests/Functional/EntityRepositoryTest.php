@@ -7,8 +7,8 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Mockery;
 use PHPUnit_Framework_TestCase;
+use RAPL\RAPL\Client\HttpClient;
 use RAPL\RAPL\Configuration;
-use RAPL\RAPL\Connection\ConnectionInterface;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\EntityRepository;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
@@ -30,20 +30,20 @@ class EntityRepositoryTest extends PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var Mockery\MockInterface|ConnectionInterface
+     * @var Mockery\MockInterface|HttpClient
      */
-    private $connection;
+    private $httpClient;
 
     protected function setUp()
     {
-        $this->connection = Mockery::mock('RAPL\RAPL\Connection\ConnectionInterface');
+        $this->httpClient = Mockery::mock(HttpClient::class);
 
         $configuration = new Configuration();
         $paths         = [__DIR__.'/../Fixtures/config'];
         $driver        = new YamlDriver($paths, '.rapl.yml');
         $configuration->setMetadataDriver($driver);
 
-        $this->entityManager = new EntityManager($this->connection, $configuration, new Router());
+        $this->entityManager = new EntityManager($this->httpClient, $configuration, new Router());
 
         $this->repository = $this->entityManager->getRepository(self::CLASS_NAME);
     }
@@ -151,9 +151,9 @@ class EntityRepositoryTest extends PHPUnit_Framework_TestCase
 
         if ($responseCode >= 400) {
             $exception = RequestException::create($request, $response);
-            $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andThrow($exception);
+            $this->httpClient->shouldReceive('request')->once()->with('GET', $uri)->andThrow($exception);
         } else {
-            $this->connection->shouldReceive('request')->once()->with('GET', $uri)->andReturn($response);
+            $this->httpClient->shouldReceive('request')->once()->with('GET', $uri)->andReturn($response);
         }
     }
 }

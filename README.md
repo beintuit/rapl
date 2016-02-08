@@ -40,7 +40,7 @@ require_once 'vendor/autoload.php';
 use GuzzleHttp\Middleware;
 use Psr7\Http\Message\RequestInterface;
 use RAPL\RAPL\Configuration;
-use RAPL\RAPL\Connection\Connection;
+use RAPL\RAPL\Client\GuzzleClient;
 use RAPL\RAPL\EntityManager;
 use RAPL\RAPL\Mapping\Driver\YamlDriver;
 use RAPL\RAPL\Routing\Router;
@@ -48,7 +48,7 @@ use RAPL\RAPL\Routing\Router;
 $middleware = Middleware::mapRequest(function (RequestInterface $request) {
    return $request->withHeader('X-Foo', 'bar');
 });
-$connection = Connection::create('http://example.com/api/', [$middleware]);
+$client = GuzzleClient::create('http://example.com/api/', [$middleware]);
 
 $configuration = new Configuration();
 $paths         = array(__DIR__ . '/config');
@@ -57,7 +57,7 @@ $configuration->setMetadataDriver($driver);
 
 $router = new Router();
 
-$manager = new EntityManager($connection, $configuration, $router);
+$manager = new EntityManager($client, $configuration, $router);
 ```
 
 ## Usage

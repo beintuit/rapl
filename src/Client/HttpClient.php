@@ -1,8 +1,8 @@
 <?php
 
-namespace RAPL\RAPL\Connection;
+namespace RAPL\RAPL\Client;
 
-interface ConnectionInterface
+interface HttpClient
 {
     /**
      * @param string $method
