@@ -1,14 +1,14 @@
 <?php
 
-namespace RAPL\Tests\Unit\Connection;
+namespace RAPL\Tests\Unit\Client;
 
 use GuzzleHttp\Middleware;
 use Mockery;
 use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
-use RAPL\RAPL\Connection\Connection;
+use RAPL\RAPL\Client\GuzzleClient;
 
-class ConnectionTest extends PHPUnit_Framework_TestCase
+class GuzzleClientTest extends PHPUnit_Framework_TestCase
 {
     const BASE_URL = 'http://example.com/api/';
 
@@ -22,17 +22,17 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     private $guzzleClient;
 
     /**
-     * @var Connection
+     * @var GuzzleClient
      */
-    private $connection;
+    private $client;
 
     protected function setUp()
     {
         $this->guzzleClient = Mockery::mock('GuzzleHttp\ClientInterface');
-        $this->connection   = new Connection($this->guzzleClient);
+        $this->client = new GuzzleClient($this->guzzleClient);
     }
 
-    public function testCreateReturnsConnectionInstance()
+    public function testCreateReturnsGuzzleClientInstance()
     {
         $middleware = [
             Middleware::mapRequest(function (RequestInterface $request) {
@@ -40,9 +40,9 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
             })
         ];
 
-        $actual = Connection::create(self::BASE_URL, $middleware);
+        $actual = GuzzleClient::create(self::BASE_URL, $middleware);
 
-        $this->assertInstanceOf('RAPL\RAPL\Connection\Connection', $actual);
+        $this->assertInstanceOf(GuzzleClient::class, $actual);
     }
 
     public function testRequestCallsRequestOnGuzzleClient()
@@ -56,7 +56,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
             ->with(self::REQUEST_METHOD, self::REQUEST_URI)
             ->andReturn($response);
 
-        $actual = $this->connection->request(self::REQUEST_METHOD, self::REQUEST_URI);
+        $actual = $this->client->request(self::REQUEST_METHOD, self::REQUEST_URI);
 
         $this->assertSame($response, $actual);
     }

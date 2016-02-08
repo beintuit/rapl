@@ -3,14 +3,14 @@
 namespace RAPL\RAPL;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use RAPL\RAPL\Connection\ConnectionInterface;
+use RAPL\RAPL\Client\HttpClient;
 
 interface EntityManagerInterface extends ObjectManager
 {
     /**
-     * @return ConnectionInterface
+     * @return HttpClient
      */
-    public function getConnection();
+    public function getHttpClient();
 
     /**
      * @return Configuration

@@ -2,16 +2,16 @@
 
 namespace RAPL\RAPL;
 
-use RAPL\RAPL\Connection\ConnectionInterface;
+use RAPL\RAPL\Client\HttpClient;
 use RAPL\RAPL\Mapping\ClassMetadataFactory;
 use RAPL\RAPL\Routing\RouterInterface;
 
 class EntityManager implements EntityManagerInterface
 {
     /**
-     * @var ConnectionInterface
+     * @var HttpClient
      */
-    private $connection;
+    private $httpClient;
 
     /**
      * @var Configuration
@@ -29,15 +29,13 @@ class EntityManager implements EntityManagerInterface
     protected $unitOfWork;
 
     /**
-     * Constructor
-     *
-     * @param ConnectionInterface $connection
-     * @param Configuration       $configuration
-     * @param RouterInterface     $router
+     * @param HttpClient      $httpClient
+     * @param Configuration   $configuration
+     * @param RouterInterface $router
      */
-    public function __construct(ConnectionInterface $connection, Configuration $configuration, RouterInterface $router)
+    public function __construct(HttpClient $httpClient, Configuration $configuration, RouterInterface $router)
     {
-        $this->connection    = $connection;
+        $this->httpClient = $httpClient;
         $this->configuration = $configuration;
 
         $this->metadataFactory = new ClassMetadataFactory();
@@ -226,11 +224,11 @@ class EntityManager implements EntityManagerInterface
     }
 
     /**
-     * @return ConnectionInterface
+     * @return HttpClient
      */
-    public function getConnection()
+    public function getHttpClient()
     {
-        return $this->connection;
+        return $this->httpClient;
     }
 
     /**

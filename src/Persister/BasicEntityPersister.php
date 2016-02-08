@@ -3,7 +3,7 @@
 namespace RAPL\RAPL\Persister;
 
 use GuzzleHttp\Exception\ClientException;
-use RAPL\RAPL\Connection\ConnectionInterface;
+use RAPL\RAPL\Client\HttpClient;
 use RAPL\RAPL\EntityManagerInterface;
 use RAPL\RAPL\Mapping\ClassMetadata;
 use RAPL\RAPL\Routing\RouterInterface;
@@ -17,9 +17,9 @@ class BasicEntityPersister implements EntityPersister
     private $manager;
 
     /**
-     * @var ConnectionInterface
+     * @var HttpClient
      */
-    private $connection;
+    private $httpClient;
 
     /**
      * @var ClassMetadata
@@ -44,7 +44,7 @@ class BasicEntityPersister implements EntityPersister
     public function __construct(EntityManagerInterface $manager, ClassMetadata $classMetadata, RouterInterface $router)
     {
         $this->manager       = $manager;
-        $this->connection    = $manager->getConnection();
+        $this->httpClient = $manager->getHttpClient();
         $this->classMetadata = $classMetadata;
 
         $this->serializer = new Serializer($classMetadata, $manager->getUnitOfWork(), $manager->getMetadataFactory());
@@ -66,7 +66,7 @@ class BasicEntityPersister implements EntityPersister
         $route = $this->getRoute($conditions);
 
         try {
-            $response = $this->connection->request('GET', $uri);
+            $response = $this->httpClient->request('GET', $uri);
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 404) {
                 return null;
@@ -111,7 +111,7 @@ class BasicEntityPersister implements EntityPersister
     {
         $uri      = $this->getUri($conditions, $orderBy, $limit, $offset);
         $route    = $this->getRoute($conditions, $orderBy, $limit, $offset);
-        $response = $this->connection->request('GET', $uri);
+        $response = $this->httpClient->request('GET', $uri);
 
         return $this->serializer->deserialize(
             $response->getBody(),

@@ -1,13 +1,13 @@
 <?php
 
-namespace RAPL\RAPL\Connection;
+namespace RAPL\RAPL\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 
-class Connection implements ConnectionInterface
+class GuzzleClient implements HttpClient
 {
     /**
      * @var ClientInterface
@@ -26,7 +26,7 @@ class Connection implements ConnectionInterface
      * @param string     $baseUrl
      * @param callable[] $middleware
      *
-     * @return Connection
+     * @return GuzzleClient
      */
     public static function create($baseUrl, array $middleware = [])
     {
